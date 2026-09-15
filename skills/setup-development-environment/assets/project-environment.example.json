@@ -1,0 +1,47 @@
+{
+  "project": {
+    "name": "",
+    "frontend": "blade",
+    "redis": true,
+    "queue": true,
+    "scheduler": true
+  },
+  "git": {
+    "provider": "github",
+    "repository": "",
+    "main_branch": "main",
+    "test_branch": "test"
+  },
+  "server": {
+    "test": {
+      "host": "",
+      "port": 22,
+      "user": "deploy",
+      "path": ""
+    },
+    "production": {
+      "enabled": true,
+      "host": "",
+      "port": 22,
+      "user": "deploy",
+      "path": ""
+    }
+  },
+  "site": {
+    "test_url": "",
+    "production_url": ""
+  },
+  "deployment": {
+    "test_on_push": true,
+    "production_trigger": "tag",
+    "production_tag_pattern": "v*",
+    "production_approval": true,
+    "delivery": "release_archive"
+  },
+  "bitrix24": {
+    "application_code": "",
+    "redirect_url": "",
+    "scope": [],
+    "uninstall_data_policy": ""
+  }
+}

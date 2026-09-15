@@ -1,0 +1,56 @@
+# GitHub and autodeploy
+
+## Pipeline
+
+- Pull Requests to `test` and `main`: run CI only.
+- Push to `test`: build once, then automatically deploy the exact artifact to the test environment.
+- Keep `test` as the active branch for routine development; update `main` only through Pull Requests.
+- Tag or release from `main`: promote the same artifact to `production` after GitHub Environment approval.
+- Never deploy arbitrary Pull Request code to production.
+
+## Workflows
+
+Create or adapt:
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/deploy-test.yml`
+- `.github/workflows/deploy-production.yml`
+
+Use pinned major actions or immutable SHAs according to repository policy. Set minimal `permissions`, job timeouts, concurrency groups, and explicit environments.
+
+CI must install locked dependencies, migrate a clean test database when PostgreSQL is selected, run backend tests, run frontend production build, and validate the deploy artifact.
+
+## Secrets and variables
+
+Use GitHub Environment Secrets for:
+
+- `DEPLOY_SSH_KEY`
+- application/integration secrets required only by that environment
+
+Use environment or repository variables for:
+
+- `DEPLOY_HOST`
+- `DEPLOY_PORT`
+- `DEPLOY_USER`
+- `DEPLOY_PATH`
+- `APP_URL`
+
+Store `DEPLOY_KNOWN_HOSTS` as a secret or protected variable according to repository policy. Never disable host verification.
+
+## Server deployment
+
+- Use a dedicated least-privilege deploy user.
+- Use versioned immutable release archives; do not build or deploy container images.
+- Install application dependencies and build frontend assets in CI before packaging.
+- Run Nginx, PHP-FPM, PostgreSQL/Redis, queue workers, and the scheduler as native server services.
+- Keep runtime `.env`, persistent storage, and backups outside the release directory.
+- Perform preflight checks, backup when required, migrations, cache refresh, queue restart, health checks, and log inspection.
+- Keep the previous successful release available.
+- Automatically revert application code when health checks fail and database compatibility permits.
+- Never automatically roll back production migrations.
+
+## Proof
+
+Query GitHub after configuring environments, secrets metadata, workflows, and branch protection. Trigger a real test deployment, record the run ID/URL, compare deployed revision with the workflow commit, run external HTTPS checks, and test application rollback on test.
+
+Prepare production deployment but require explicit authorization before triggering it.

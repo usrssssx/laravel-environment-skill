@@ -1,0 +1,6 @@
+interface:
+  display_name: "Настройка среды разработки"
+  short_description: "Готовит Laravel-среду и автодеплой проекта"
+  default_prompt: "Используй $setup-development-environment, чтобы подготовить среду разработки и настроить автодеплой текущего проекта."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,29 @@
+name: Validate skill
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate distribution
+        run: python scripts/validate_distribution.py
+      - name: Check Python syntax
+        run: python -m py_compile skills/setup-development-environment/scripts/validate_config.py
+      - name: Check shell syntax
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            bash -n "$file"
+          done < <(find skills/setup-development-environment -type f \( -name '*.sh' -o -name '*.sh.tpl' \) -print0)

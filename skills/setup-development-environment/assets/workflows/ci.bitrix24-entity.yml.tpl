@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, test]
+  push:
+    branches: [main, test]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_ENV: testing
+      REDIS_HOST: 127.0.0.1
+    steps:
+      - uses: __CHECKOUT_ACTION__
+      - uses: __SETUP_PHP_ACTION__
+        with:
+          php-version: '__PHP_VERSION__'
+          extensions: bcmath, intl, mbstring, pcntl, xml, zip
+          coverage: none
+      - uses: __SETUP_NODE_ACTION__
+        with:
+          node-version: '__NODE_VERSION__'
+          cache: npm
+      - name: Install and start Redis
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y redis-server
+          sudo systemctl start redis-server
+          redis-cli ping
+      - name: Prepare environment
+        run: cp .env.example .env
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Generate application key
+        run: php artisan key:generate
+      - name: Run unit and storage contract tests
+        run: php artisan test
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Build frontend
+        run: npm run build
+      - name: Show logs on failure
+        if: failure()
+        run: sudo journalctl -u redis-server --no-pager -n 200
