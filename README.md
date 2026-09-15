@@ -19,8 +19,10 @@ Ask Codex to install the skill from this repository:
 
 ```text
 Use $skill-installer to install the setup-development-environment skill
-from this GitHub repository.
+from https://github.com/usrssssx/laravel-environment-skill/tree/main/skills/setup-development-environment
 ```
+
+Repository: <https://github.com/usrssssx/laravel-environment-skill>
 
 After installation, restart Codex if the skill is not visible, then invoke it explicitly:
 
