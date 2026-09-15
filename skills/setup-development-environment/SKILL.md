@@ -1,6 +1,6 @@
 ---
 name: setup-development-environment
-description: Prepare and verify a complete native PHP 8.x/Laravel development environment and GitHub Actions deployment pipeline without Docker. Use when the user asks to initialize a new project, standardize an existing Laravel workspace, choose PostgreSQL or Bitrix24 entity.* storage, configure GitHub branches and secrets, prepare a Linux server with Nginx and PHP-FPM, or set up automatic test and controlled production deployment. Do not use for ordinary feature development, Docker-based environments, or isolated CI fixes.
+description: Prepare and verify a complete native PHP 8.x/Laravel Bitrix24 application environment and GitHub Actions deployment pipeline without Docker. New applications include a server-validated Bitrix24 launch gate that blocks direct browser access. Use when the user asks to initialize a new project, standardize an existing Laravel workspace, choose PostgreSQL or Bitrix24 entity.* storage, configure GitHub branches and secrets, prepare a Linux server with Nginx and PHP-FPM, or set up automatic test and controlled production deployment. Do not use for ordinary feature development, Docker-based environments, or isolated CI fixes.
 ---
 
 # Setup Development Environment
@@ -26,6 +26,7 @@ System approval prompts for external or privileged actions are not user-design q
 Read only the references needed for the selected path:
 
 - Always read `references/input-contract.md`, `references/workflow.md`, and `references/native-environment.md`.
+- For a new application or a requested Bitrix24-only browser gate, read `references/bitrix24-browser-gate.md`.
 - For PostgreSQL, read `references/postgresql.md`.
 - For Bitrix24 `entity.*`, read `references/bitrix24-entity.md`.
 - Before GitHub or server changes, read `references/autodeploy.md`.
@@ -80,7 +81,7 @@ Required external secrets normally include:
 
 ## Phase 4: prepare local environment
 
-1. For a missing application, create a stable Laravel version compatible with the available PHP 8.x runtime.
+1. For a missing application, create a stable Laravel version compatible with the available PHP 8.x runtime, then install the starter files from `assets/starter/bitrix24-browser-gate/`.
 2. For an existing application, make the smallest environment-only changes.
 3. Configure Blade/Vite by default. Preserve or configure Vue 3 when detected or specified.
 4. Detect the operating system and available package manager. Install or configure PHP, required extensions, Composer, Node.js, PostgreSQL when selected, Redis when enabled, and local process controls without Docker.
@@ -88,6 +89,8 @@ Required external secrets normally include:
 6. Pin application dependencies and record installed runtime versions. Do not replace compatible existing runtimes unnecessarily.
 7. Keep `.env`, keys, tokens, dumps, and runtime data outside Git.
 8. Add basic application and health checks; preserve existing test conventions.
+9. New applications must expose the configured Bitrix24 launch URL at `/bitrix24/launch`. A direct browser request to `/` or `/bitrix24/launch` must show exactly `Откройте приложение из Битрикс24`; only a launch POST whose OAuth token passes a server-side `app.info` call may create an application session.
+10. Never treat iframe presence, `Referer`, request headers, `DOMAIN`, or `member_id` as proof of Bitrix24 access. Never return, log, flash, or store `AUTH_ID` or `REFRESH_ID` in a browser-accessible store.
 
 ## Phase 5: prepare Git and GitHub
 
@@ -124,6 +127,7 @@ Run `references/verification.md` checks and the bundled scripts. At minimum veri
 - required native runtime versions and PHP extensions;
 - PostgreSQL, Redis, PHP-FPM, Nginx, queue, and scheduler service health when applicable;
 - application HTTP response and health endpoint;
+- direct-access gate, rejected forged launch, successful mocked Bitrix24 launch, session expiry, and frame policy;
 - storage connection or Bitrix24 adapter contract tests;
 - migrations for PostgreSQL;
 - backend tests and frontend production build;

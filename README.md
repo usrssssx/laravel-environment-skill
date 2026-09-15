@@ -1,10 +1,12 @@
 # Laravel Environment Skill
 
-A reusable Codex skill that prepares and verifies a native PHP/Laravel development environment and GitHub Actions deployment pipeline without Docker.
+A reusable Codex skill that prepares and verifies a native PHP/Laravel Bitrix24 application, including a secure browser-entry gate and GitHub Actions deployment pipeline without Docker.
 
 ## Capabilities
 
 - creates a compatible stable Laravel application when the project is empty;
+- creates a minimal empty application shell available only after a server-validated launch from the Bitrix24 interface;
+- shows `Откройте приложение из Битрикс24` when its URL is opened directly;
 - preserves compatible Laravel projects and existing architecture;
 - supports PostgreSQL or Bitrix24 `entity.*` application storage;
 - configures native PHP, Composer, Node.js, Redis, Nginx, PHP-FPM, queue workers, and scheduler services;
@@ -56,7 +58,7 @@ skills/setup-development-environment/
 
 ## Safety
 
-Test the skill with non-production infrastructure first. Do not commit private keys, tokens, passwords, runtime `.env` files, database dumps, or production data. Report security issues according to [SECURITY.md](SECURITY.md).
+Test the skill with non-production infrastructure first. The generated launch gate verifies `AUTH_ID` through Bitrix24 `app.info`; iframe state, referrer headers, and launch fields alone never authorize access. Do not commit private keys, tokens, passwords, runtime `.env` files, database dumps, or production data. Report security issues according to [SECURITY.md](SECURITY.md).
 
 ## License
 

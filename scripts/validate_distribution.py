@@ -21,6 +21,15 @@ def main():
         SKILL / "assets" / "project-environment.example.json",
         SKILL / "scripts" / "preflight.sh",
         SKILL / "scripts" / "validate_config.py",
+        SKILL / "references" / "bitrix24-browser-gate.md",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "bootstrap" / "app.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "routes" / "web.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "config" / "bitrix24.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "app" / "Services" / "Bitrix24" / "LaunchVerifier.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "resources" / "views" / "bitrix24" / "gate.blade.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "resources" / "views" / "bitrix24" / "app.blade.php.tpl",
+        SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "tests" / "Feature" / "Bitrix24BrowserGateTest.php.tpl",
     ]
     for path in required:
         if not path.is_file():
@@ -49,6 +58,35 @@ def main():
         fail(errors, "test branch must be test")
     if config.get("deployment", {}).get("delivery") != "release_archive":
         fail(errors, "deployment delivery must be release_archive")
+
+    starter = SKILL / "assets" / "starter" / "bitrix24-browser-gate"
+    controller_text = (starter / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl").read_text(encoding="utf-8")
+    verifier_text = (starter / "app" / "Services" / "Bitrix24" / "LaunchVerifier.php.tpl").read_text(encoding="utf-8")
+    bootstrap_text = (starter / "bootstrap" / "app.php.tpl").read_text(encoding="utf-8")
+    gate_text = (starter / "resources" / "views" / "bitrix24" / "gate.blade.php.tpl").read_text(encoding="utf-8")
+
+    security_requirements = {
+        "direct-access message": (gate_text, "Откройте приложение из Битрикс24"),
+        "server-side app.info verification": (verifier_text, "/rest/app.info.json"),
+        "outbound redirect blocking": (verifier_text, "'allow_redirects' => false"),
+        "public-address validation": (verifier_text, "FILTER_FLAG_NO_PRIV_RANGE"),
+        "OAuth token excluded from session": (controller_text, "'bitrix24.context'"),
+        "authorized frame policy": (controller_text, "frame-ancestors https://{$portal}"),
+        "narrow CSRF exception": (bootstrap_text, "'bitrix24/launch'"),
+    }
+    for label, (text, marker) in security_requirements.items():
+        if marker not in text:
+            fail(errors, f"missing browser-gate requirement: {label}")
+
+    session_write = re.search(
+        r"session\(\)->put\('bitrix24\.context', \[(.*?)\]\);",
+        controller_text,
+        re.DOTALL,
+    )
+    if not session_write:
+        fail(errors, "browser-gate session write was not found")
+    elif re.search(r"AUTH_ID|REFRESH_ID|access_token|refresh_token", session_write.group(1), re.IGNORECASE):
+        fail(errors, "OAuth token must not be written into the application session")
 
     forbidden = {
         "personal macOS path": re.compile(r"/Users/[^/]+/"),
