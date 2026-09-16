@@ -33,7 +33,7 @@ Use $setup-development-environment to prepare the current project,
 GitHub repository, and test deployment. Do not deploy to production.
 ```
 
-The skill intentionally uses explicit invocation. It will first inspect the project and ask at most one architecture question: PostgreSQL or Bitrix24 `entity.*`. Missing non-secret infrastructure values are requested once as a single JSON block.
+The skill intentionally uses explicit invocation. It will first inspect the project and ask at most one architecture question: PostgreSQL or Bitrix24 `entity.*`. Before it finishes, missing GitHub URL, server IP/host, SSH user, deployment path, and site URL are requested once as a single JSON block. A server password, when needed for initial access, is requested separately as a transient secret and is replaced with a dedicated deploy key for GitHub Actions.
 
 ## Requirements
 

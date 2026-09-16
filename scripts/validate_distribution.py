@@ -58,6 +58,21 @@ def main():
         fail(errors, "test branch must be test")
     if config.get("deployment", {}).get("delivery") != "release_archive":
         fail(errors, "deployment delivery must be release_archive")
+    if "repository_url" not in config.get("git", {}):
+        fail(errors, "example config must include git.repository_url")
+    for environment in ["test", "production"]:
+        if "auth_method" not in config.get("server", {}).get(environment, {}):
+            fail(errors, f"example config must include server.{environment}.auth_method")
+
+    input_contract = (SKILL / "references" / "input-contract.md").read_text(encoding="utf-8")
+    completion_requirements = {
+        "GitHub repository URL request": "git.repository_url",
+        "server bootstrap password request": "DEPLOY_BOOTSTRAP_PASSWORD",
+        "password exclusion from JSON": "Never show a password field inside the JSON example",
+    }
+    for label, marker in completion_requirements.items():
+        if marker not in input_contract:
+            fail(errors, f"missing pre-completion requirement: {label}")
 
     starter = SKILL / "assets" / "starter" / "bitrix24-browser-gate"
     controller_text = (starter / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl").read_text(encoding="utf-8")

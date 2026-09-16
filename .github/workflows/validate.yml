@@ -21,6 +21,8 @@ jobs:
         run: python scripts/validate_distribution.py
       - name: Check Python syntax
         run: python -m py_compile skills/setup-development-environment/scripts/validate_config.py
+      - name: Test configuration validation
+        run: python -m unittest scripts/test_validate_config.py
       - name: Check shell syntax
         shell: bash
         run: |

@@ -9,6 +9,7 @@
   "git": {
     "provider": "github",
     "repository": "",
+    "repository_url": "",
     "main_branch": "main",
     "test_branch": "test"
   },
@@ -16,15 +17,17 @@
     "test": {
       "host": "",
       "port": 22,
-      "user": "deploy",
-      "path": ""
+      "user": "",
+      "path": "",
+      "auth_method": ""
     },
     "production": {
       "enabled": true,
       "host": "",
       "port": 22,
-      "user": "deploy",
-      "path": ""
+      "user": "",
+      "path": "",
+      "auth_method": ""
     }
   },
   "site": {

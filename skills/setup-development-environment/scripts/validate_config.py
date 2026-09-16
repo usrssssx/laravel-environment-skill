@@ -34,6 +34,48 @@ def valid_https_url(value):
     return parsed.scheme == "https" and bool(parsed.netloc)
 
 
+def github_repository_from_url(value):
+    if not isinstance(value, str):
+        return None
+    parsed = urlparse(value)
+    try:
+        port = parsed.port
+    except ValueError:
+        return None
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname != "github.com"
+        or port is not None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+    ):
+        return None
+    parts = [part for part in parsed.path.strip("/").split("/") if part]
+    if len(parts) != 2:
+        return None
+    owner, repository = parts
+    if repository.endswith(".git"):
+        repository = repository[:-4]
+    candidate = f"{owner}/{repository}"
+    return candidate if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", candidate) else None
+
+
+def forbidden_secret_paths(value, prefix=""):
+    found = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            path = f"{prefix}.{key}" if prefix else key
+            if key.lower() in {"password", "ssh_password", "server_password", "deploy_bootstrap_password"}:
+                found.append(path)
+            found.extend(forbidden_secret_paths(child, path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found.extend(forbidden_secret_paths(child, f"{prefix}[{index}]"))
+    return found
+
+
 def main():
     if len(sys.argv) != 3:
         print("Usage: validate_config.py <project-environment.json> <postgresql|bitrix24_entity>", file=sys.stderr)
@@ -57,13 +99,13 @@ def main():
     required = [
         "project.name",
         "project.frontend",
-        "git.repository",
         "git.main_branch",
         "git.test_branch",
         "server.test.host",
         "server.test.port",
         "server.test.user",
         "server.test.path",
+        "server.test.auth_method",
         "site.test_url",
         "deployment.test_on_push",
         "deployment.production_trigger",
@@ -78,6 +120,7 @@ def main():
             "server.production.port",
             "server.production.user",
             "server.production.path",
+            "server.production.auth_method",
             "site.production_url",
         ])
 
@@ -92,13 +135,23 @@ def main():
     missing = [field for field in required if missing_value(value_at(data, field))]
     invalid = []
 
+    repository = value_at(data, "git.repository")
+    repository_url = value_at(data, "git.repository_url")
+    if missing_value(repository) and missing_value(repository_url):
+        missing.append("git.repository_url")
+
     frontend = value_at(data, "project.frontend")
     if frontend not in {None, "", "blade", "vue3"}:
         invalid.append("project.frontend must be blade or vue3")
 
-    repository = value_at(data, "git.repository")
     if repository and not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", str(repository)):
         invalid.append("git.repository must use owner/repository format")
+
+    repository_from_url = github_repository_from_url(repository_url) if repository_url else None
+    if repository_url and repository_from_url is None:
+        invalid.append("git.repository_url must use https://github.com/owner/repository format")
+    if repository and repository_from_url and repository != repository_from_url:
+        invalid.append("git.repository and git.repository_url must identify the same repository")
 
     fixed_values = {
         "git.main_branch": "main",
@@ -120,6 +173,11 @@ def main():
         if value and not str(value).startswith("/"):
             invalid.append(f"{field} must be an absolute path")
 
+    for field in ["server.test.auth_method", "server.production.auth_method"]:
+        value = value_at(data, field)
+        if value not in {None, "", "password", "ssh_key"}:
+            invalid.append(f"{field} must be password or ssh_key")
+
     for field in ["site.test_url", "site.production_url"]:
         value = value_at(data, field)
         if value and not valid_https_url(value):
@@ -137,9 +195,15 @@ def main():
         if policy not in {None, "", "retain", "anonymize", "delete"}:
             invalid.append("bitrix24.uninstall_data_policy must be retain, anonymize, or delete")
 
+    for secret_path in forbidden_secret_paths(data):
+        invalid.append(f"{secret_path} must not be stored in project-environment.json; provide it through a secure input channel")
+
     request = {}
     for field in missing:
-        default = fixed_values.get(field, 22 if field.endswith(".port") else "")
+        default = fixed_values.get(
+            field,
+            22 if field.endswith(".port") else "password" if field.endswith(".auth_method") else "",
+        )
         set_path(request, field, default)
     for field, expected in fixed_values.items():
         if value_at(data, field) not in {expected}:
@@ -149,11 +213,23 @@ def main():
         {"environment": "test", "name": "DEPLOY_SSH_KEY"},
         {"environment": "test", "name": "DEPLOY_KNOWN_HOSTS"},
     ]
+    if value_at(data, "server.test.auth_method") in {None, "", "password"}:
+        required_secrets.append({
+            "environment": "test",
+            "name": "DEPLOY_BOOTSTRAP_PASSWORD",
+            "handling": "transient_secure_input_only",
+        })
     if production_enabled:
         required_secrets.extend([
             {"environment": "production", "name": "DEPLOY_SSH_KEY"},
             {"environment": "production", "name": "DEPLOY_KNOWN_HOSTS"},
         ])
+        if value_at(data, "server.production.auth_method") in {None, "", "password"}:
+            required_secrets.append({
+                "environment": "production",
+                "name": "DEPLOY_BOOTSTRAP_PASSWORD",
+                "handling": "transient_secure_input_only",
+            })
     if profile == "bitrix24_entity":
         required_secrets.extend([
             {"environment": "test", "name": "BITRIX24_CLIENT_ID"},

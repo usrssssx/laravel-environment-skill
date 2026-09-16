@@ -17,6 +17,15 @@ Accept `postgres`, `postgresql`, `pg` as `postgresql`; accept `entity`, `entity.
 
 Do not ask separate questions about Git, server, domain, or deployment. Discover values first, then request all missing infrastructure values once as a single JSON block based on `assets/project-environment.example.json`. Data collection is one consolidated request, not an interview. Do not ask follow-up questions field by field.
 
+Before ending the setup, run the configuration validator again. Unless the user explicitly requested local-only setup or declined deployment, do not issue the final completion response while the GitHub repository URL, enabled server connection data, site URL, or bootstrap SSH credential is missing. Pause with one consolidated request containing:
+
+- GitHub repository URL;
+- server IP/host, SSH port, SSH user, deployment path, and authentication method;
+- public HTTPS site URL;
+- the name of the missing bootstrap secret, supplied separately through an approved secure channel.
+
+When password authentication is selected, request `DEPLOY_BOOTSTRAP_PASSWORD` as a transient secret. Never place its value in JSON, Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
+
 If supplied data is invalid or still incomplete, create `setup-required-inputs.md` with exact missing paths and validation errors. Stop external setup while continuing every safe local step that does not depend on those values.
 
 System approval prompts for external or privileged actions are not user-design questions and cannot be bypassed.
@@ -72,10 +81,12 @@ For `bitrix24_entity`:
 4. Run `scripts/validate_config.py project-environment.json <storage-profile>`.
 5. If required non-secret values are missing, request them once using the exact JSON subtree produced by the validator.
 6. Obtain secrets from existing GitHub Environment Secrets, protected process environment variables, or an approved secure input channel. Never request that secrets be committed to a file.
+7. If local setup finishes before infrastructure data is available, create `setup-required-inputs.md` and make the consolidated infrastructure request before stopping. Resume GitHub, server, and real test-deploy setup when the user responds.
 
 Required external secrets normally include:
 
 - `DEPLOY_SSH_KEY` and `DEPLOY_KNOWN_HOSTS` for each deployment environment;
+- transient `DEPLOY_BOOTSTRAP_PASSWORD` when the server initially permits password authentication only;
 - GitHub authentication with repository administration rights;
 - Bitrix24 client credentials for `bitrix24_entity` when OAuth is needed.
 
@@ -158,5 +169,7 @@ Create `environment-setup-report.md` containing:
 - workflow run URL/ID and deployed commit when available;
 - completion state;
 - exact remaining blockers.
+
+For `LOCAL_READY`, include the exact consolidated GitHub/server request in both `setup-required-inputs.md` and the user-facing response. Do not merely list missing field names. Omit this request only when deployment was explicitly excluded by the user.
 
 Do not say "автодеплой настроен" unless a real test deployment and external health check succeeded.

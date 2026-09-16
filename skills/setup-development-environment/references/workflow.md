@@ -15,7 +15,8 @@
 11. Configure GitHub Secrets and Environments through authenticated tooling.
 12. Run a real test deployment and verify it.
 13. Prepare controlled production deployment without triggering it.
-14. Produce the final report.
+14. Revalidate the GitHub URL, enabled server data, site URL, and bootstrap credential. If any are missing and deployment was not excluded, request them in one block and pause.
+15. Produce the final report only after external setup is completed or the user explicitly limits the task to local setup.
 
 ## Existing-project rule
 
