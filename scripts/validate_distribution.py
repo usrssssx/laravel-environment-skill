@@ -68,11 +68,14 @@ def main():
     completion_requirements = {
         "GitHub repository URL request": "git.repository_url",
         "server bootstrap password request": "DEPLOY_BOOTSTRAP_PASSWORD",
-        "password exclusion from JSON": "Never show a password field inside the JSON example",
+        "plain-text user response": "answer one ordinary message",
+        "no user-facing JSON": "Do not ask the user for JSON",
     }
     for label, marker in completion_requirements.items():
         if marker not in input_contract:
             fail(errors, f"missing pre-completion requirement: {label}")
+    if "```json" in input_contract:
+        fail(errors, "input contract must not show a user-facing JSON block")
 
     starter = SKILL / "assets" / "starter" / "bitrix24-browser-gate"
     controller_text = (starter / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl").read_text(encoding="utf-8")

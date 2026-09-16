@@ -1,6 +1,6 @@
 # Input contract
 
-Use `project-environment.json` for non-secret project and infrastructure data. Start from `../assets/project-environment.example.json`.
+Use `project-environment.json` internally for non-secret project and infrastructure data. Start from `../assets/project-environment.example.json`. The agent owns this file; the user never has to compose or edit it.
 
 ## Rules
 
@@ -10,9 +10,10 @@ Use `project-environment.json` for non-secret project and infrastructure data. S
 - Never store private keys, passwords, tokens, OAuth client secrets, webhook secrets, or full server `.env` contents in the JSON file.
 - Treat empty strings as missing values.
 - Validate with `scripts/validate_config.py`.
-- Request all missing values in one consolidated JSON block.
+- Request all missing values in one consolidated plain-language chat message.
 - Do not ask the user to repeat values already detected.
-- Never put a server password in the JSON block. Request only its secret name and secure delivery method.
+- Do not ask the user for JSON, a schema, or a configuration file. Parse ordinary prose and `Поле: значение` lines yourself.
+- A server password may be accepted from the chat response, but never copy or echo it into the internal JSON or any generated file.
 
 ## Required common fields
 
@@ -38,7 +39,7 @@ For `bitrix24_entity`, also require non-secret Bitrix24 application metadata: ap
 
 Prefer GitHub Environment Secrets for deploy keys and environment-specific credentials. Use protected local environment variables only during setup. Keep the application runtime `.env` on the server with restrictive permissions.
 
-When `auth_method` is `password`, request `DEPLOY_BOOTSTRAP_PASSWORD` separately through an approved secure input channel. Use it transiently to connect, verify the host key, and install the deploy public key. Do not save it as a GitHub secret because recurring deployments must use the dedicated SSH key.
+When `auth_method` is `password`, treat the SSH password supplied in chat as `DEPLOY_BOOTSTRAP_PASSWORD`. Do not repeat it in acknowledgements or summaries. Use it transiently to connect, verify the host key, and install the deploy public key. Do not save it as a GitHub secret because recurring deployments must use the dedicated SSH key.
 
 ## Missing-data behavior
 
@@ -47,30 +48,18 @@ When validation fails, write `setup-required-inputs.md` with:
 1. selected storage profile;
 2. missing JSON paths;
 3. invalid values and accepted formats;
-4. a minimal JSON subtree to complete;
+4. a plain-language list of values still needed;
 5. required secret names without values;
 6. safe local work already completed.
 
-Before pausing, show the user a directly fillable block shaped like this, omitting values already discovered and disabled environments:
+Before pausing, ask the user to answer one ordinary message. Omit values already discovered and disabled environments. Use this shape without a code fence:
 
-```json
-{
-  "git": {
-    "repository_url": "https://github.com/owner/repository"
-  },
-  "server": {
-    "test": {
-      "host": "203.0.113.10",
-      "port": 22,
-      "user": "deploy",
-      "path": "/var/www/application",
-      "auth_method": "password"
-    }
-  },
-  "site": {
-    "test_url": "https://test.example.com"
-  }
-}
-```
+- Ссылка на GitHub:
+- IP или домен сервера:
+- SSH-порт, если не 22:
+- SSH-пользователь:
+- SSH-пароль или пометка «доступ по ключу»:
+- Путь проекта на сервере:
+- Ссылка тестового сайта:
 
-After the JSON block, request the transient `DEPLOY_BOOTSTRAP_PASSWORD` separately when `auth_method` is `password`. Never show a password field inside the JSON example.
+Allow a natural-language answer such as: `GitHub уже создан по ссылке ...; сервер 203.0.113.10, пользователь deploy, пароль ..., проект разместить в /var/www/application, сайт https://test.example.com.` Parse it without asking the user to reformat the same information.

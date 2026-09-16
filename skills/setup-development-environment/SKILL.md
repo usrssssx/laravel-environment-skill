@@ -15,16 +15,16 @@ Ask at most one decision question unless the user already supplied the answer:
 
 Accept `postgres`, `postgresql`, `pg` as `postgresql`; accept `entity`, `entity.*`, `bitrix24` as `bitrix24_entity`.
 
-Do not ask separate questions about Git, server, domain, or deployment. Discover values first, then request all missing infrastructure values once as a single JSON block based on `assets/project-environment.example.json`. Data collection is one consolidated request, not an interview. Do not ask follow-up questions field by field.
+Do not ask separate questions about Git, server, domain, or deployment. Discover values first, then request all missing infrastructure values once in one plain-language chat message. The user must be able to reply with ordinary prose or simple `Поле: значение` lines. Never require, show, or ask the user to edit JSON. Convert the answer into the internal `project-environment.json` yourself. Data collection is one consolidated request, not an interview. Do not ask follow-up questions field by field when the answer can be parsed reasonably.
 
 Before ending the setup, run the configuration validator again. Unless the user explicitly requested local-only setup or declined deployment, do not issue the final completion response while the GitHub repository URL, enabled server connection data, site URL, or bootstrap SSH credential is missing. Pause with one consolidated request containing:
 
 - GitHub repository URL;
 - server IP/host, SSH port, SSH user, deployment path, and authentication method;
 - public HTTPS site URL;
-- the name of the missing bootstrap secret, supplied separately through an approved secure channel.
+- SSH password when password authentication is selected.
 
-When password authentication is selected, request `DEPLOY_BOOTSTRAP_PASSWORD` as a transient secret. Never place its value in JSON, Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
+When password authentication is selected, accept the password in the user's ordinary chat response as the transient `DEPLOY_BOOTSTRAP_PASSWORD`. Do not repeat it in later messages. Never place its value in JSON, generated Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
 
 If supplied data is invalid or still incomplete, create `setup-required-inputs.md` with exact missing paths and validation errors. Stop external setup while continuing every safe local step that does not depend on those values.
 
@@ -79,8 +79,8 @@ For `bitrix24_entity`:
 2. Fill values already discovered from the repository and environment.
 3. Keep secrets out of this file.
 4. Run `scripts/validate_config.py project-environment.json <storage-profile>`.
-5. If required non-secret values are missing, request them once using the exact JSON subtree produced by the validator.
-6. Obtain secrets from existing GitHub Environment Secrets, protected process environment variables, or an approved secure input channel. Never request that secrets be committed to a file.
+5. If required values are missing, use the validator output only as an internal checklist and translate it into one concise plain-text request. Do not expose its JSON response to the user.
+6. Accept a bootstrap SSH password in the user's chat response when needed; treat it as transient sensitive input and never copy it into project files or reports. Obtain long-lived secrets from existing GitHub Environment Secrets, protected process environment variables, or an approved secure input channel. Never request that secrets be committed to a file.
 7. If local setup finishes before infrastructure data is available, create `setup-required-inputs.md` and make the consolidated infrastructure request before stopping. Resume GitHub, server, and real test-deploy setup when the user responds.
 
 Required external secrets normally include:
