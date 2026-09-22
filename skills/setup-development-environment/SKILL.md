@@ -124,8 +124,8 @@ Required external secrets normally include:
 ## Phase 6: prepare server and deployment
 
 1. Read `references/cloudpanel.md`, `references/manual-checkpoints.md`, `references/backup-policy.md`, and `references/autodeploy.md` fully.
-2. Ask the user to create or confirm the CloudPanel PHP site and primary site user. Verify the domain, site path, PHP version, and that the document root can point to the Laravel `public` directory.
-3. Ask the user to create a separate least-privilege deploy SSH user assigned only to the site. Generate an ED25519 key with `scripts/generate_deploy_key.sh`, show only the public key, ask the user to add it in CloudPanel, then verify key-only access and path permissions with `scripts/verify_ssh_access.sh`.
+2. Ask the user to create or confirm the CloudPanel PHP site and provide only the server host, primary site user, and test URL. Do not ask the user for the absolute site path.
+3. Ask the user to create a separate least-privilege deploy SSH user assigned only to the site. Generate an ED25519 key with `scripts/generate_deploy_key.sh`, show only the public key, ask the user to add it in CloudPanel, then determine the absolute site path over key-only SSH with `scripts/discover_cloudpanel_site_path.sh`. Record the verified path internally and verify access and path permissions with `scripts/verify_ssh_access.sh`.
 4. Do not deploy into the deploy user's home by assumption. Confirm the actual CloudPanel site path and ownership. Stop if the deploy user cannot safely write release directories under that site path.
 5. Create CI, test deployment, and controlled production deployment workflows.
 6. Copy and adapt the project scripts from `assets/project-scripts/`; copy `scripts/check_deploy_artifact.sh` into the target project's `scripts/check-deploy-artifact.sh` when using the release-archive templates.

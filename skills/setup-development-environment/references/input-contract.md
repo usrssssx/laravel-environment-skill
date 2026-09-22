@@ -60,4 +60,4 @@ For the initial external step, ask only for the GitHub repository URL. Later Clo
 
 Show this Bitrix24 instruction link first whenever asking the user to create a GitHub repository. The page may require the user's existing Bitrix24 authorization; do not attempt to reproduce or guess its private contents.
 
-At the CloudPanel site checkpoint, ask for the server host, primary site user, actual site path, and test URL produced by that step. At the deploy-user checkpoint, ask only for that user's name and temporary password or existing key access. Never ask for later-stage database or portal values early.
+At the CloudPanel site checkpoint, ask only for the server host, primary site user, and test URL produced by that step. Do not ask the user for the absolute site path. After key-only SSH works, derive the domain from `site.test_url`, run `scripts/discover_cloudpanel_site_path.sh`, verify the returned path with `scripts/verify_ssh_access.sh`, and record it as `server.test.path`. At the deploy-user checkpoint, ask only for that user's name and temporary password or existing key access. Never ask for later-stage database or portal values early.

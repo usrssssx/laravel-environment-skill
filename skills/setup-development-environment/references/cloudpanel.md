@@ -19,9 +19,9 @@ Official documentation:
 
 ## Site checkpoint
 
-Show the user-provided Bitrix24 instruction link above, then ask the user to create a PHP site with the test domain and compatible PHP version. Record the generated primary site user and actual site directory. CloudPanel stores site files under the site user's home; never invent `/var/www/...` when the panel reports another path.
+Show the user-provided Bitrix24 instruction link above, then ask the user to create a PHP site with the test domain and compatible PHP version. Ask only for the server host, generated primary site user, and test URL. Do not ask the user to find or type the site directory.
 
-Verify over SSH:
+After the deploy public key is installed, derive the domain from the verified test URL and run `scripts/discover_cloudpanel_site_path.sh`. Store its verified result as `server.test.path`; never invent `/var/www/...` or assume the deploy user's home. Then verify over SSH:
 
 - the site directory exists;
 - the primary site user owns the expected site tree;
@@ -33,7 +33,7 @@ Verify over SSH:
 
 The primary site user and deploy identity are distinct responsibilities. Ask the user to create a dedicated SSH/FTP deploy user assigned only to the intended site. Propose a predictable name such as `deploy-<short-project-name>` when CloudPanel permits it.
 
-Generate an ED25519 key outside the repository. Show only the `.pub` content and ask the user to add it under the deploy user's SSH keys. After confirmation, verify key-only login, the remote identity, the resolved site path, and narrowly scoped write access. Never add the private key to CloudPanel or show it in chat.
+Generate an ED25519 key outside the repository. Show only the `.pub` content and ask the user to add it under the deploy user's SSH keys. After confirmation, verify key-only login, discover the actual site path with the bundled helper, then verify the remote identity and narrowly scoped write access. Never add the private key to CloudPanel or show it in chat.
 
 If CloudPanel cannot grant the additional user safe access to the existing site directory, stop. Do not silently deploy under the user's separate home directory. Resolve ownership/ACL policy with the server administrator or use the existing site user as an explicitly approved exception.
 

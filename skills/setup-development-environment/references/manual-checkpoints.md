@@ -12,10 +12,10 @@ Use this protocol for every CloudPanel action.
 
 ## Checkpoint order
 
-1. `cloudpanel_site_created`: PHP site, test domain, primary site user, and actual path are known.
+1. `cloudpanel_site_created`: PHP site, test domain, server host, and primary site user are known; the user is not asked for the filesystem path.
 2. `deploy_user_created`: restricted deploy user exists and is assigned only to the target site.
 3. `deploy_public_key_installed`: generated ED25519 public key was added to that user.
-4. `deploy_key_login_verified`: key-only SSH succeeds and the site path is writable without broad privileges.
+4. `deploy_key_login_verified`: key-only SSH succeeds; the skill discovers the site path over SSH and verifies it is writable without broad privileges.
 5. Storage checkpoint:
    - PostgreSQL: credentials target the approved service and `database_connection_verified` passes.
    - Bitrix24: application is installed on a dedicated test portal and `bitrix24_test_installation_verified` passes.

@@ -12,6 +12,45 @@ SKILL_SCRIPTS = ROOT / "skills" / "setup-development-environment" / "scripts"
 
 
 class OperationalHelpersTest(unittest.TestCase):
+    def test_cloudpanel_path_helper_discovers_path_over_key_only_ssh(self):
+        with tempfile.TemporaryDirectory() as directory:
+            temp = Path(directory)
+            fake_bin = temp / "bin"
+            fake_bin.mkdir()
+            fake_ssh = fake_bin / "ssh"
+            fake_ssh.write_text(
+                "#!/usr/bin/env bash\n"
+                "printf 'path=/home/site-user/htdocs/test.example.com\\n'\n",
+                encoding="utf-8",
+            )
+            fake_ssh.chmod(0o755)
+            key = temp / "deploy_key"
+            known_hosts = temp / "known_hosts"
+            key.write_text("private-test-fixture", encoding="utf-8")
+            known_hosts.write_text("test.example.com ssh-ed25519 fixture", encoding="utf-8")
+            env = os.environ.copy()
+            env["PATH"] = f"{fake_bin}:{env['PATH']}"
+
+            result = subprocess.run(
+                [
+                    str(SKILL_SCRIPTS / "discover_cloudpanel_site_path.sh"),
+                    "test.example.com",
+                    "22",
+                    "deploy-demo",
+                    "site-user",
+                    "test.example.com",
+                    str(key),
+                    str(known_hosts),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+
+            self.assertEqual(0, result.returncode)
+            self.assertEqual("path=/home/site-user/htdocs/test.example.com", result.stdout.strip())
+
     def test_github_auth_helper_starts_web_login_and_verifies_result(self):
         with tempfile.TemporaryDirectory() as directory:
             fake_bin = Path(directory) / "bin"

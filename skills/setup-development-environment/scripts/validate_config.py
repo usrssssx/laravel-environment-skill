@@ -103,7 +103,6 @@ def stage_definitions(profile, production_enabled):
                 "server.test.host",
                 "server.test.port",
                 "server.test.site_user",
-                "server.test.path",
                 "site.test_url",
             ],
             "checkpoints": ["checkpoints.cloudpanel_site_created"],
@@ -115,7 +114,7 @@ def stage_definitions(profile, production_enabled):
         },
         {
             "id": "deploy_key",
-            "fields": [],
+            "fields": ["server.test.path"],
             "checkpoints": [
                 "checkpoints.deploy_public_key_installed",
                 "checkpoints.deploy_key_login_verified",

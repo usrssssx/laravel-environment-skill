@@ -23,6 +23,7 @@ def main():
         SKILL / "scripts" / "validate_config.py",
         SKILL / "scripts" / "generate_deploy_key.sh",
         SKILL / "scripts" / "start_github_auth.sh",
+        SKILL / "scripts" / "discover_cloudpanel_site_path.sh",
         SKILL / "scripts" / "verify_ssh_access.sh",
         SKILL / "scripts" / "verify_postgresql.sh",
         SKILL / "scripts" / "verify_tls.py",

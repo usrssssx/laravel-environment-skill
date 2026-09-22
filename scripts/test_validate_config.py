@@ -66,7 +66,20 @@ class ValidateConfigTest(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertEqual("cloudpanel_site", payload["next_step"]["id"])
         self.assertIn("server.test.site_user", payload["next_step"]["missing_fields"])
+        self.assertNotIn("server.test.path", payload["next_step"]["missing_fields"])
         self.assertNotIn("server.test.user", payload["request"].get("server", {}).get("test", {}))
+
+    def test_site_path_is_discovered_during_deploy_key_checkpoint(self):
+        config = copy.deepcopy(self.config)
+        config["server"]["test"]["path"] = ""
+        config["checkpoints"]["deploy_public_key_installed"] = False
+        config["checkpoints"]["deploy_key_login_verified"] = False
+
+        result, payload = self.validate(config)
+
+        self.assertEqual(1, result.returncode)
+        self.assertEqual("deploy_key", payload["next_step"]["id"])
+        self.assertIn("server.test.path", payload["next_step"]["missing_fields"])
 
     def test_rejects_claim_that_stock_cloudpanel_manages_postgresql(self):
         self.config["database"]["management"] = "cloudpanel"
