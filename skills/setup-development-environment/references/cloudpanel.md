@@ -31,9 +31,9 @@ After the deploy public key is installed, derive the domain from the verified te
 
 ## Deploy-user checkpoint
 
-The primary site user and deploy identity are distinct responsibilities. Ask the user to create a dedicated SSH/FTP deploy user assigned only to the intended site. Propose a predictable name such as `deploy-<short-project-name>` when CloudPanel permits it.
+The primary site user and deploy identity are distinct responsibilities. Before asking the user to act, propose a predictable name such as `deploy-<short-project-name>` and generate a dedicated ED25519 pair outside the repository. Show only the public key. Then ask the user, in one action, to create that SSH deploy user assigned only to the intended site and add the displayed public key.
 
-Generate an ED25519 key outside the repository. Show only the `.pub` content and ask the user to add it under the deploy user's SSH keys. After confirmation, verify key-only login, discover the actual site path with the bundled helper, then verify the remote identity and narrowly scoped write access. Never add the private key to CloudPanel or show it in chat.
+Do not ask for a password by default. Use temporary password bootstrap only when the user explicitly reports that CloudPanel cannot add the public key directly. After confirmation, verify key-only login, discover the actual site path with the bundled helper, then verify the remote identity and narrowly scoped write access. Never add the private key to CloudPanel or show it in chat.
 
 If CloudPanel cannot grant the additional user safe access to the existing site directory, stop. Do not silently deploy under the user's separate home directory. Resolve ownership/ACL policy with the server administrator or use the existing site user as an explicitly approved exception.
 

@@ -96,6 +96,7 @@ def main():
         "no user-facing JSON": "Do not ask the user for JSON",
         "agent-started GitHub authentication": "run `scripts/start_github_auth.sh` with TTY enabled",
         "local operational metadata": "Add them to `.gitignore` before populating infrastructure metadata",
+        "key-first deploy user checkpoint": "generate a dedicated ED25519 pair outside the repository",
     }
     for label, marker in completion_requirements.items():
         if marker not in input_contract:

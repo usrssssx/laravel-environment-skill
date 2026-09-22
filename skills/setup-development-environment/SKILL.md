@@ -17,11 +17,13 @@ Accept `postgres`, `postgresql`, `pg` as `postgresql`; accept `entity`, `entity.
 
 After local preparation, work as a guided wizard. Run `scripts/validate_config.py`, inspect `next_step`, and ask for only that step. Give one short manual CloudPanel action, wait for the user's confirmation or values, verify the result technically, record the checkpoint internally, then continue. Do not front-load all infrastructure questions.
 
+When `next_step.id` is `deploy_user`, do not ask for a password first. Derive a predictable username such as `deploy-<short-project-name>`, generate a dedicated ED25519 key outside the repository with `scripts/generate_deploy_key.sh`, and show only the public key. Ask the user to create that CloudPanel user for the test site and add the displayed key in the same action. Use password bootstrap only as an explicit fallback when CloudPanel cannot install the key directly.
+
 The user may answer with ordinary prose or `Поле: значение` lines. Never require, show, or ask the user to edit JSON. Convert answers into the internal `project-environment.json` yourself. Do not repeat a question when the answer can be parsed reasonably.
 
 Do not automate CloudPanel through browser UI. Manual control-panel actions are intentionally user-owned because UI access and layouts vary. Link the relevant official instruction, describe the exact expected result, and perform command-line or HTTPS verification afterward.
 
-When password authentication is selected, accept the password in the user's ordinary chat response as the transient `DEPLOY_BOOTSTRAP_PASSWORD`. Do not repeat it in later messages. Never place its value in JSON, generated Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
+When direct public-key installation is unavailable and password authentication is explicitly selected as a fallback, accept the password in the user's ordinary chat response as the transient `DEPLOY_BOOTSTRAP_PASSWORD`. Do not repeat it in later messages. Never place its value in JSON, generated Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
 
 If supplied data is invalid or still incomplete, create `setup-required-inputs.md` with exact missing paths and validation errors. Stop external setup while continuing every safe local step that does not depend on those values.
 
@@ -126,7 +128,7 @@ Required external secrets normally include:
 
 1. Read `references/cloudpanel.md`, `references/manual-checkpoints.md`, `references/backup-policy.md`, and `references/autodeploy.md` fully.
 2. Ask the user to create or confirm the CloudPanel PHP site and provide only the server host, primary site user, and test URL. Do not ask the user for the absolute site path.
-3. Ask the user to create a separate least-privilege deploy SSH user assigned only to the site. Generate an ED25519 key with `scripts/generate_deploy_key.sh`, show only the public key, ask the user to add it in CloudPanel, then determine the absolute site path over key-only SSH with `scripts/discover_cloudpanel_site_path.sh`. Record the verified path internally and verify access and path permissions with `scripts/verify_ssh_access.sh`.
+3. Before asking the user to create a deploy identity, choose and state a predictable name such as `deploy-<short-project-name>`. Generate a dedicated ED25519 key outside the repository with `scripts/generate_deploy_key.sh`, show only the public key, and ask the user to create that least-privilege CloudPanel user for only the intended site and add the key during the same checkpoint. After confirmation, set `auth_method=ssh_key`, verify key-only login, determine the absolute site path with `scripts/discover_cloudpanel_site_path.sh`, record it internally, and verify access and path permissions with `scripts/verify_ssh_access.sh`.
 4. Do not deploy into the deploy user's home by assumption. Confirm the actual CloudPanel site path and ownership. Stop if the deploy user cannot safely write release directories under that site path.
 5. Create CI, test deployment, and controlled production deployment workflows.
 6. Copy and adapt the project scripts from `assets/project-scripts/`; copy `scripts/check_deploy_artifact.sh` into the target project's `scripts/check-deploy-artifact.sh` when using the release-archive templates.

@@ -11,7 +11,7 @@
 7. Add tests, logs, queue, scheduler, and health checks.
 8. Run all local checks.
 9. Guide the user through CloudPanel site creation and verify it.
-10. Guide deploy-user and ED25519 key installation, then verify key-only access and site-path permissions.
+10. Generate the ED25519 deploy key first, propose the deploy username, ask the user to create that CloudPanel user with the displayed public key, then verify key-only access and site-path permissions.
 11. Configure and verify PostgreSQL, or deploy and verify the Bitrix24 test-portal installation and live `entity.*` contract.
 12. Guide trusted-certificate issuance and verify TLS.
 13. If GitHub CLI authentication is missing or expired, start the bundled browser-auth helper in a TTY, wait for the user's browser confirmation, and verify the resulting session. Then configure GitHub Actions, secrets, environments, and repository settings.
