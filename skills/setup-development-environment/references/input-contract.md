@@ -14,6 +14,7 @@ Use `project-environment.json` internally for non-secret project and infrastruct
 - Do not ask the user to repeat values already detected.
 - Do not ask the user for JSON, a schema, or a configuration file. Parse ordinary prose and `Поле: значение` lines yourself.
 - A server password may be accepted from the chat response, but never copy or echo it into the internal JSON or any generated file.
+- GitHub authentication is an agent-started authorization checkpoint, not a data question. When `gh auth status --hostname github.com` fails, run `scripts/start_github_auth.sh` with TTY enabled and ask the user only to complete GitHub's browser confirmation. Do not ask the user to run the command or send a token.
 
 ## Required common fields
 

@@ -14,7 +14,7 @@
 10. Guide deploy-user and ED25519 key installation, then verify key-only access and site-path permissions.
 11. Configure and verify PostgreSQL, or deploy and verify the Bitrix24 test-portal installation and live `entity.*` contract.
 12. Guide trusted-certificate issuance and verify TLS.
-13. Configure GitHub Actions, secrets, environments, and repository settings.
+13. If GitHub CLI authentication is missing or expired, start the bundled browser-auth helper in a TTY, wait for the user's browser confirmation, and verify the resulting session. Then configure GitHub Actions, secrets, environments, and repository settings.
 14. Run and verify real test deployment and rollback.
 15. Verify daily backup and an isolated restore drill.
 16. Prepare controlled production deployment without triggering it.
@@ -46,4 +46,5 @@ Prefer existing compatible conventions. Do not upgrade major framework/runtime v
 - Never generate or rotate live secrets without authorization.
 - Do not run production deployment as part of setup.
 - External changes require accessible credentials and may trigger platform approval.
+- Start GitHub browser authentication yourself when needed. Do not hand the user a `gh auth login` command and stop; pause only for the browser confirmation that GitHub requires.
 - CloudPanel browser actions remain manual. Give one action at a time and verify it before continuing.

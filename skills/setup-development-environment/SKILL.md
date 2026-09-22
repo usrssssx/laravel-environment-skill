@@ -47,7 +47,7 @@ Use files under `assets/` as starting points. Adapt them to the inspected projec
 1. Run `scripts/preflight.sh <project-root>`.
 2. Inspect Git status before editing. Preserve unrelated and user-owned changes.
 3. Inspect `composer.json`, lock files, Laravel version, PHP constraints, frontend stack, environment examples, migrations, queues, tests, system-service configuration, and existing workflows.
-4. Detect GitHub repository from `git remote get-url origin` and authentication from `gh auth status` when available.
+4. Detect GitHub repository from `git remote get-url origin` and authentication from `gh auth status` when available. When `gh` is installed but authentication is missing or invalid, start `scripts/start_github_auth.sh` yourself in a TTY and wait for browser confirmation; do not tell the user to run `gh auth login` manually.
 5. Detect configuration from `project-environment.json` when present.
 6. Never replace established compatible versions or architecture merely to match a template.
 
@@ -111,14 +111,15 @@ Required external secrets normally include:
 3. Use `feature/*` and `fix/*` branches from `test`; merge them back into `test`. Use `hotfix/*` from `main` only when required.
 4. Do not switch branches when that risks user changes.
 5. Create the GitHub repository only when it does not exist and the user supplied or approved the target owner/name.
-6. Configure branch protection when authenticated with sufficient rights:
+6. Before repository administration, run `gh auth status --hostname github.com`. If it fails, run `scripts/start_github_auth.sh` in an interactive terminal with TTY enabled. Tell the user only to confirm the authorization in the browser, keep the terminal session alive until it completes, and verify `gh auth status` afterward. Never request or expose a GitHub token in chat.
+7. Configure branch protection when authenticated with sufficient rights:
    - Pull Request required for `main`;
    - at least one approval;
    - required CI checks;
    - resolved discussions;
    - no force-push or deletion;
    - successful CI and no force-push for `test`.
-7. Never claim GitHub settings were applied without querying them afterward.
+8. Never claim GitHub settings were applied without querying them afterward.
 
 ## Phase 6: prepare server and deployment
 

@@ -12,6 +12,7 @@ A reusable Codex skill that guides a beginner through a verified native PHP/Lara
 - configures native PHP, Composer, Node.js, Redis, Nginx, PHP-FPM, queue workers, and scheduler services;
 - uses `main` for production and `test` for integration and test deployment;
 - prepares GitHub Actions, immutable release archives, test deployment, health checks, and application rollback;
+- starts GitHub CLI browser authorization itself when the local session is missing or expired;
 - guides CloudPanel site, deploy-user, ED25519 key, and trusted TLS setup one step at a time;
 - requires daily backups and a real isolated restore drill;
 - requires a managed PostgreSQL target or a live Bitrix24 `entity.*` test-portal contract;
@@ -45,7 +46,7 @@ Stock CloudPanel manages MySQL/MariaDB, not PostgreSQL. When PostgreSQL is selec
 - Codex with local filesystem and terminal access;
 - macOS or Linux with an available package manager;
 - Git and SSH;
-- GitHub CLI authentication for repository administration;
+- GitHub CLI installed; the skill starts browser authentication when repository administration requires it;
 - a dedicated test server and domain for real deployment verification.
 
 External changes remain subject to Codex approvals and the permissions of the authenticated GitHub and SSH accounts.

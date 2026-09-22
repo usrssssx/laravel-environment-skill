@@ -12,6 +12,80 @@ SKILL_SCRIPTS = ROOT / "skills" / "setup-development-environment" / "scripts"
 
 
 class OperationalHelpersTest(unittest.TestCase):
+    def test_github_auth_helper_starts_web_login_and_verifies_result(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fake_bin = Path(directory) / "bin"
+            fake_bin.mkdir()
+            state = Path(directory) / "authenticated"
+            calls = Path(directory) / "calls"
+            fake_gh = fake_bin / "gh"
+            fake_gh.write_text(
+                "#!/usr/bin/env bash\n"
+                "echo \"$*\" >> \"$FAKE_GH_CALLS\"\n"
+                "if [[ \"$1 $2\" == \"auth status\" ]]; then\n"
+                "  [[ -f \"$FAKE_GH_STATE\" ]]\n"
+                "  exit\n"
+                "fi\n"
+                "if [[ \"$1 $2\" == \"auth login\" ]]; then\n"
+                "  touch \"$FAKE_GH_STATE\"\n"
+                "  exit 0\n"
+                "fi\n"
+                "exit 1\n",
+                encoding="utf-8",
+            )
+            fake_gh.chmod(0o755)
+            env = os.environ.copy()
+            env.update({
+                "PATH": f"{fake_bin}:{env['PATH']}",
+                "FAKE_GH_CALLS": str(calls),
+                "FAKE_GH_STATE": str(state),
+            })
+
+            result = subprocess.run(
+                [str(SKILL_SCRIPTS / "start_github_auth.sh")],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+
+            self.assertEqual(0, result.returncode)
+            call_log = calls.read_text(encoding="utf-8")
+            self.assertIn("auth login --hostname github.com --git-protocol https --web", call_log)
+            self.assertEqual(2, call_log.count("auth status --hostname github.com"))
+            self.assertIn("authentication verified", result.stdout)
+
+    def test_github_auth_helper_skips_login_when_session_is_valid(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fake_bin = Path(directory) / "bin"
+            fake_bin.mkdir()
+            calls = Path(directory) / "calls"
+            fake_gh = fake_bin / "gh"
+            fake_gh.write_text(
+                "#!/usr/bin/env bash\n"
+                "echo \"$*\" >> \"$FAKE_GH_CALLS\"\n"
+                "exit 0\n",
+                encoding="utf-8",
+            )
+            fake_gh.chmod(0o755)
+            env = os.environ.copy()
+            env.update({
+                "PATH": f"{fake_bin}:{env['PATH']}",
+                "FAKE_GH_CALLS": str(calls),
+            })
+
+            result = subprocess.run(
+                [str(SKILL_SCRIPTS / "start_github_auth.sh")],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+
+            self.assertEqual(0, result.returncode)
+            self.assertEqual("auth status --hostname github.com\n", calls.read_text(encoding="utf-8"))
+            self.assertIn("already authenticated", result.stdout)
+
     def test_deploy_key_is_generated_once_without_printing_private_material(self):
         with tempfile.TemporaryDirectory() as directory:
             key_path = Path(directory) / "deploy_key"

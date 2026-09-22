@@ -22,6 +22,7 @@ def main():
         SKILL / "scripts" / "preflight.sh",
         SKILL / "scripts" / "validate_config.py",
         SKILL / "scripts" / "generate_deploy_key.sh",
+        SKILL / "scripts" / "start_github_auth.sh",
         SKILL / "scripts" / "verify_ssh_access.sh",
         SKILL / "scripts" / "verify_postgresql.sh",
         SKILL / "scripts" / "verify_tls.py",
@@ -91,6 +92,7 @@ def main():
         "server bootstrap password request": "DEPLOY_BOOTSTRAP_PASSWORD",
         "stepwise collection": "Request only the current validator `next_step`",
         "no user-facing JSON": "Do not ask the user for JSON",
+        "agent-started GitHub authentication": "run `scripts/start_github_auth.sh` with TTY enabled",
     }
     for label, marker in completion_requirements.items():
         if marker not in input_contract:
