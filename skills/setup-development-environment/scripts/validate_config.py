@@ -125,9 +125,6 @@ def stage_definitions(profile, production_enabled):
         stages.append({
             "id": "postgresql",
             "fields": [
-                "database.management",
-                "database.host",
-                "database.port",
                 "database.name",
                 "database.user",
             ],

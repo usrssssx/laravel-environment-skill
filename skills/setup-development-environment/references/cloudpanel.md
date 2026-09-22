@@ -42,8 +42,8 @@ If CloudPanel cannot grant the additional user safe access to the existing site 
 Stock CloudPanel v2 documents MySQL and MariaDB management; its database UI, `clpctl db:*`, phpMyAdmin, and built-in database backup process are not PostgreSQL management tools. Therefore:
 
 - do not tell the user to create PostgreSQL in the CloudPanel Databases screen unless their installed/custom edition demonstrably supports it;
-- prefer an external managed PostgreSQL service and record `database.management=external_managed`;
-- permit native PostgreSQL on the server only after explicit user authorization and record `database.management=native_explicit`;
+- when the user provides only a database name, username, and password for this server, use loopback `127.0.0.1:5432` and record `database.management=native_explicit` without asking for host or port;
+- use an external managed PostgreSQL service and record `database.management=external_managed` only when the user explicitly supplies or selects an external host;
 - never report PostgreSQL as "CloudPanel-managed" without a verified provider capability.
 
 If the project is allowed to switch to MySQL/MariaDB, that is a new architecture decision and requires explicit user approval; this skill must not make the switch silently.

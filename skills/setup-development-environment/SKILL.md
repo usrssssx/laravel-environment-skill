@@ -59,9 +59,10 @@ Ask the single storage question only when the selection is absent from the user'
 
 For `postgresql`:
 
-- use a dedicated managed PostgreSQL service by default;
+- when the user can provide only a database name, username, and password for the test server, infer server-local PostgreSQL at `127.0.0.1:5432`, record `database.management=native_explicit`, and do not ask for host or port;
+- use an external managed PostgreSQL host only when the user explicitly supplies or selects one;
 - never claim stock CloudPanel manages PostgreSQL: official CloudPanel v2 database features support MySQL/MariaDB, not PostgreSQL;
-- if the user explicitly chooses native PostgreSQL, document that it is outside CloudPanel management and require explicit authorization, hardened access, backup automation, and a restore drill;
+- treat the user's request to use server-local credentials as authorization for the native PostgreSQL path, document that it is outside CloudPanel management, and require hardened loopback access, backup automation, and a restore drill;
 - configure Laravel's PostgreSQL driver;
 - create separate local and test databases;
 - use Laravel migrations;
@@ -81,6 +82,7 @@ For `bitrix24_entity`:
 1. Copy `assets/project-environment.example.json` to `project-environment.json` only if no config exists.
 2. Before adding infrastructure values, ensure `project-environment.json`, `environment-setup-report.md`, and `setup-required-inputs.md` are ignored by Git and are not tracked. If a fresh project accidentally tracked empty template versions, remove only those paths from the index while preserving the local files before recording hostnames, IPs, users, paths, or URLs.
 3. Fill values already discovered from the repository and environment.
+   For server-local PostgreSQL, fill `database.management=native_explicit`, `database.host=127.0.0.1`, and `database.port=5432` yourself. Ask the user only for the database name, username, and password; never store the password in JSON.
 4. Keep secrets out of this file. Treat server hostnames, IP addresses, usernames, paths, and operational checkpoint evidence as local infrastructure metadata even though they are not passwords.
 5. Run `scripts/validate_config.py project-environment.json <storage-profile>` after every completed checkpoint.
 6. Translate only `next_step` into a concise plain-text instruction or question. Do not expose validator JSON.

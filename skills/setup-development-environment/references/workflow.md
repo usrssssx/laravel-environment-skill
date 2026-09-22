@@ -31,7 +31,7 @@ Prefer existing compatible conventions. Do not upgrade major framework/runtime v
 - native PHP, Composer, and Node.js toolchain
 - Nginx + PHP-FPM
 - Redis for cache/queue when enabled
-- native PostgreSQL for local development when selected; server PostgreSQL is managed externally by default or explicitly administered outside CloudPanel
+- native PostgreSQL for local development when selected; server-local PostgreSQL defaults to `127.0.0.1:5432` outside CloudPanel management when the user supplies only database credentials
 - systemd-managed queue and scheduler processes on Linux servers
 - GitHub Actions CI
 - `main` and `test` branches, with `test` active for routine development

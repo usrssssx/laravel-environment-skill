@@ -89,6 +89,28 @@ class ValidateConfigTest(unittest.TestCase):
         self.assertEqual(1, result.returncode)
         self.assertIn("stock CloudPanel does not manage PostgreSQL", payload["invalid"][0])
 
+    def test_server_local_postgresql_requests_only_name_and_user(self):
+        config = copy.deepcopy(self.config)
+        config["database"].update({
+            "management": "native_explicit",
+            "host": "127.0.0.1",
+            "port": 5432,
+            "name": "",
+            "user": "",
+        })
+        config["checkpoints"]["database_connection_verified"] = False
+
+        result, payload = self.validate(config)
+
+        self.assertEqual(1, result.returncode)
+        self.assertEqual("postgresql", payload["next_step"]["id"])
+        self.assertEqual(
+            ["database.name", "database.user"],
+            payload["next_step"]["missing_fields"],
+        )
+        self.assertNotIn("host", payload["request"]["database"])
+        self.assertNotIn("port", payload["request"]["database"])
+
     def test_rejects_password_fields_without_echoing_secret(self):
         self.config["server"]["test"]["password"] = "do-not-echo-this"
 
