@@ -44,9 +44,9 @@ jobs:
           sudo apt-get install -y mysql-server redis-server
           sudo systemctl start mysql
           sudo systemctl start redis-server
-          sudo mysql --execute="CREATE DATABASE laravel_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-          sudo mysql --execute="CREATE USER 'laravel'@'127.0.0.1' IDENTIFIED BY 'laravel_test_password'"
-          sudo mysql --execute="GRANT ALL PRIVILEGES ON laravel_test.* TO 'laravel'@'127.0.0.1'"
+          mysql --user=root --password=root --execute="CREATE DATABASE laravel_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+          mysql --user=root --password=root --execute="CREATE USER 'laravel'@'127.0.0.1' IDENTIFIED BY 'laravel_test_password'"
+          mysql --user=root --password=root --execute="GRANT ALL PRIVILEGES ON laravel_test.* TO 'laravel'@'127.0.0.1'"
           mysqladmin --host=127.0.0.1 --user=laravel --password=laravel_test_password ping
           redis-cli ping
       - name: Prepare environment
