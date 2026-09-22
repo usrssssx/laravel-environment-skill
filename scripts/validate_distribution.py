@@ -87,6 +87,7 @@ def main():
         fail(errors, f"example config is missing checkpoints: {sorted(missing_checkpoints)}")
 
     input_contract = (SKILL / "references" / "input-contract.md").read_text(encoding="utf-8")
+    internal_instruction_url = "https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419"
     completion_requirements = {
         "GitHub repository URL request": "git.repository_url",
         "server bootstrap password request": "DEPLOY_BOOTSTRAP_PASSWORD",
@@ -99,11 +100,15 @@ def main():
             fail(errors, f"missing pre-completion requirement: {label}")
     if "```json" in input_contract:
         fail(errors, "input contract must not show a user-facing JSON block")
+    if internal_instruction_url not in input_contract:
+        fail(errors, "GitHub repository checkpoint is missing the user-provided instruction URL")
 
     cloudpanel_text = (SKILL / "references" / "cloudpanel.md").read_text(encoding="utf-8")
     for marker in ["Stock CloudPanel v2", "ED25519", "self-signed certificate"]:
         if marker not in cloudpanel_text:
             fail(errors, f"CloudPanel reference is missing requirement: {marker}")
+    if internal_instruction_url not in cloudpanel_text:
+        fail(errors, "CloudPanel checkpoint is missing the user-provided instruction URL")
 
     starter = SKILL / "assets" / "starter" / "bitrix24-browser-gate"
     controller_text = (starter / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl").read_text(encoding="utf-8")

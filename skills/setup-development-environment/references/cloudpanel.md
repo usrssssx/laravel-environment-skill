@@ -2,6 +2,12 @@
 
 CloudPanel actions are manual checkpoints. Do not control the panel through browser automation. Give the user one action, wait, then verify the observable result.
 
+Always show this user-provided instruction link first when asking the user to create or configure a CloudPanel site:
+
+- `https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419`
+
+The page may require the user's existing Bitrix24 authorization. Do not attempt to reproduce or guess its private contents. Keep the official CloudPanel links below as secondary technical references.
+
 Official documentation:
 
 - Add a PHP site: `https://www.cloudpanel.io/docs/v2/frontend-area/add-site/`
@@ -13,7 +19,7 @@ Official documentation:
 
 ## Site checkpoint
 
-Ask the user to create a PHP site with the test domain and compatible PHP version. Record the generated primary site user and actual site directory. CloudPanel stores site files under the site user's home; never invent `/var/www/...` when the panel reports another path.
+Show the user-provided Bitrix24 instruction link above, then ask the user to create a PHP site with the test domain and compatible PHP version. Record the generated primary site user and actual site directory. CloudPanel stores site files under the site user's home; never invent `/var/www/...` when the panel reports another path.
 
 Verify over SSH:
 
