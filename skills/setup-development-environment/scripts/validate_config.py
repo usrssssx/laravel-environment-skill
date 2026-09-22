@@ -293,9 +293,7 @@ def validate(data, profile):
             "name": "DEPLOY_BOOTSTRAP_PASSWORD",
             "handling": "transient_only",
         })
-    if profile == "mysql":
-        required_secrets.append({"environment": "test", "name": "DATABASE_PASSWORD"})
-    else:
+    if profile == "bitrix24_entity":
         required_secrets.extend([
             {"environment": "test", "name": "BITRIX24_CLIENT_ID"},
             {"environment": "test", "name": "BITRIX24_CLIENT_SECRET"},
@@ -311,9 +309,7 @@ def validate(data, profile):
                 "name": "DEPLOY_BOOTSTRAP_PASSWORD",
                 "handling": "transient_only",
             })
-        if profile == "mysql":
-            required_secrets.append({"environment": "production", "name": "DATABASE_PASSWORD"})
-        else:
+        if profile == "bitrix24_entity":
             required_secrets.extend([
                 {"environment": "production", "name": "BITRIX24_CLIENT_ID"},
                 {"environment": "production", "name": "BITRIX24_CLIENT_SECRET"},

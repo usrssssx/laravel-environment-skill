@@ -28,6 +28,7 @@ fi
 
 mkdir "$release"
 tar -xzf "$archive" -C "$release"
+printf '%s\n' "$revision" > "$release/REVISION"
 
 if [[ ! -f "$deploy_path/shared/.env" ]]; then
   echo "ERROR: server environment file is missing: $deploy_path/shared/.env" >&2
@@ -69,4 +70,3 @@ curl --fail --show-error --silent --retry 5 --retry-delay 2 "$health_url/health"
 trap - ERR
 rm -f "$archive" "$0"
 echo "DEPLOYED_REVISION=$revision"
-

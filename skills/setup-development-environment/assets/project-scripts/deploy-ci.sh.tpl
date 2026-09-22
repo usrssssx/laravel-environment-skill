@@ -33,3 +33,15 @@ scp "${scp_options[@]}" scripts/deploy-release.sh "$USER@$HOST:$remote_script"
 
 ssh "${ssh_options[@]}" "$USER@$HOST" \
   "bash '$remote_script' '$PATH_ON_SERVER' '$revision' '$remote_archive' '$APP_URL'"
+
+current_release="$(ssh "${ssh_options[@]}" "$USER@$HOST" "readlink -f '$PATH_ON_SERVER/current'")"
+[[ "${current_release##*/}" == "$revision" ]] || {
+  echo "ERROR: current release does not match revision: $current_release" >&2
+  exit 1
+}
+
+health_revision="$(curl --fail --show-error --silent --retry 5 --retry-delay 2 "$APP_URL/health" | php -r '$payload=json_decode(stream_get_contents(STDIN), true, 512, JSON_THROW_ON_ERROR); echo $payload["revision"] ?? "";')"
+[[ "$health_revision" == "$revision" ]] || {
+  echo "ERROR: HTTP health revision does not match: $health_revision" >&2
+  exit 1
+}

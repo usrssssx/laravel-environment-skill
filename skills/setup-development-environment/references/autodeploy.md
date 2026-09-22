@@ -18,6 +18,8 @@ Create or adapt:
 
 Use pinned major actions or immutable SHAs according to repository policy. Set minimal `permissions`, job timeouts, concurrency groups, and explicit environments.
 
+GitHub registers a `workflow_run` listener only when that workflow file exists on the default branch. In a new repository, bootstrap the deploy workflow through a Pull Request from `test` to `main`, wait for all required checks, and obtain the required independent approval before merging. Do not use administrator bypass merely to make the first deployment start. Once the workflow is present on `main`, push a new revision to `test` and verify that CI completion triggers the deploy workflow automatically.
+
 CI must install locked dependencies, migrate a clean test database when MySQL is selected, run backend tests, run frontend production build, and validate the deploy artifact.
 
 ## Secrets and variables
@@ -49,12 +51,13 @@ For CloudPanel, the user creates the deploy identity and installs the generated 
 - Run Nginx, PHP-FPM, MySQL/Redis, queue workers, and the scheduler as native server services.
 - Keep runtime `.env`, persistent storage, and backups outside the release directory.
 - Perform preflight checks, backup when required, migrations, cache refresh, queue restart, health checks, and log inspection.
+- Write the deployed commit to a release-local `REVISION` file. The HTTP health response must expose that value, and CI must compare it with the expected workflow SHA; a generic HTTP 200 is not deployment proof.
 - Keep the previous successful release available.
 - Automatically revert application code when health checks fail and database compatibility permits.
 - Never automatically roll back production migrations.
 
 ## Proof
 
-Query GitHub after configuring environments, secrets metadata, workflows, and branch protection. Trigger a real test deployment, record the run ID/URL, compare deployed revision with the workflow commit, run external HTTPS checks, and test application rollback on test.
+Query GitHub after configuring environments, secrets metadata, workflows, and branch protection. Trigger a real test deployment, record the run ID/URL, compare both the `current` symlink and HTTP health revision with the workflow commit, run external HTTPS checks, and test application rollback on test.
 
 Prepare production deployment but require explicit authorization before triggering it.

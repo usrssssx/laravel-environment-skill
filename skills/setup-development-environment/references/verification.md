@@ -43,7 +43,7 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Test workflow completed successfully.
 - External HTTPS health check passed.
 - Trusted TLS certificate matches the hostname, has acceptable remaining validity, and HTTP redirects to HTTPS.
-- Deployed revision equals the expected commit/digest.
+- Both the server `current` symlink and the HTTP health revision equal the expected commit/digest; HTTP 200 alone is insufficient.
 - Storage, Redis, queue, scheduler, and logs were checked.
 - Application rollback was tested without destructive database rollback.
 - A fresh daily backup exists with a retention period from one to five days.

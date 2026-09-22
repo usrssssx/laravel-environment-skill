@@ -55,6 +55,10 @@ class ValidateConfigTest(unittest.TestCase):
         self.assertEqual(0, result.returncode)
         self.assertTrue(payload["ok"])
         self.assertIsNone(payload["next_step"])
+        self.assertNotIn(
+            "DATABASE_PASSWORD",
+            {secret["name"] for secret in payload["required_secrets"]},
+        )
 
     def test_returns_only_the_next_manual_stage(self):
         config = copy.deepcopy(self.config)

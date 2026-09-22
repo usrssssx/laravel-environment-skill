@@ -8,4 +8,11 @@ Route::match(['get', 'post'], '/bitrix24/launch', [Bitrix24AppController::class,
     ->middleware('throttle:20,1')
     ->name('bitrix24.launch');
 
-Route::get('/health', static fn () => response()->json(['status' => 'ok']))->name('health');
+Route::get('/health', static function () {
+    $revisionFile = base_path('REVISION');
+
+    return response()->json([
+        'status' => 'ok',
+        'revision' => is_file($revisionFile) ? trim(file_get_contents($revisionFile)) : 'local',
+    ]);
+})->name('health');
