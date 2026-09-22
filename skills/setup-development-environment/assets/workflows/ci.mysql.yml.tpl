@@ -20,9 +20,9 @@ jobs:
     timeout-minutes: 20
     env:
       APP_ENV: testing
-      DB_CONNECTION: pgsql
+      DB_CONNECTION: mysql
       DB_HOST: 127.0.0.1
-      DB_PORT: 5432
+      DB_PORT: 3306
       DB_DATABASE: laravel_test
       DB_USERNAME: laravel
       DB_PASSWORD: laravel_test_password
@@ -32,21 +32,22 @@ jobs:
       - uses: __SETUP_PHP_ACTION__
         with:
           php-version: '__PHP_VERSION__'
-          extensions: bcmath, intl, mbstring, pcntl, pdo_pgsql, xml, zip
+          extensions: bcmath, intl, mbstring, pcntl, pdo_mysql, xml, zip
           coverage: none
       - uses: __SETUP_NODE_ACTION__
         with:
           node-version: '__NODE_VERSION__'
           cache: npm
-      - name: Install and start PostgreSQL and Redis
+      - name: Install and start MySQL and Redis
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql postgresql-client redis-server
-          sudo systemctl start postgresql
+          sudo apt-get install -y mysql-server redis-server
+          sudo systemctl start mysql
           sudo systemctl start redis-server
-          sudo -u postgres psql -v ON_ERROR_STOP=1 -c "CREATE ROLE laravel LOGIN PASSWORD 'laravel_test_password'"
-          sudo -u postgres createdb --owner=laravel laravel_test
-          pg_isready -h 127.0.0.1 -p 5432
+          sudo mysql --execute="CREATE DATABASE laravel_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+          sudo mysql --execute="CREATE USER 'laravel'@'127.0.0.1' IDENTIFIED BY 'laravel_test_password'"
+          sudo mysql --execute="GRANT ALL PRIVILEGES ON laravel_test.* TO 'laravel'@'127.0.0.1'"
+          mysqladmin --host=127.0.0.1 --user=laravel --password=laravel_test_password ping
           redis-cli ping
       - name: Prepare environment
         run: cp .env.example .env
@@ -64,4 +65,4 @@ jobs:
         run: npm run build
       - name: Show logs on failure
         if: failure()
-        run: sudo journalctl -u postgresql -u redis-server --no-pager -n 200
+        run: sudo journalctl -u mysql -u redis-server --no-pager -n 200

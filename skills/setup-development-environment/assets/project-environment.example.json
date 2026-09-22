@@ -40,9 +40,9 @@
     "manual_only": true
   },
   "database": {
-    "management": "native_explicit",
+    "management": "cloudpanel",
     "host": "127.0.0.1",
-    "port": 5432,
+    "port": 3306,
     "name": "",
     "user": ""
   },

@@ -12,7 +12,7 @@
 8. Run all local checks.
 9. Guide the user through CloudPanel site creation and verify it.
 10. Generate the ED25519 deploy key first, propose the deploy username, ask the user to create that CloudPanel user with the displayed public key, then verify key-only access and site-path permissions.
-11. Configure and verify PostgreSQL, or deploy and verify the Bitrix24 test-portal installation and live `entity.*` contract.
+11. Configure and verify MySQL, or deploy and verify the Bitrix24 test-portal installation and live `entity.*` contract.
 12. Guide trusted-certificate issuance and verify TLS.
 13. If GitHub CLI authentication is missing or expired, start the bundled browser-auth helper in a TTY, wait for the user's browser confirmation, and verify the resulting session. Then configure GitHub Actions, secrets, environments, and repository settings.
 14. Run and verify real test deployment and rollback.
@@ -31,7 +31,7 @@ Prefer existing compatible conventions. Do not upgrade major framework/runtime v
 - native PHP, Composer, and Node.js toolchain
 - Nginx + PHP-FPM
 - Redis for cache/queue when enabled
-- native PostgreSQL for local development when selected; server-local PostgreSQL defaults to `127.0.0.1:5432` outside CloudPanel management when the user supplies only database credentials
+- native MySQL for local development when selected; the CloudPanel test-server database defaults to `127.0.0.1:3306` when the user supplies its generated credentials
 - systemd-managed queue and scheduler processes on Linux servers
 - GitHub Actions CI
 - `main` and `test` branches, with `test` active for routine development

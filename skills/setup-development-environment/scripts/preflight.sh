@@ -45,7 +45,7 @@ file_state .env.example
 file_state project-environment.json
 
 echo "[tools]"
-for tool in git php php-fpm composer node npm psql pg_isready redis-cli nginx systemctl brew apt-get gh ssh curl; do
+for tool in git php php-fpm composer node npm mysql mysqladmin redis-cli nginx systemctl brew apt-get gh ssh curl; do
   command_state "$tool"
 done
 
@@ -53,7 +53,7 @@ echo "[versions]"
 command -v php >/dev/null 2>&1 && php -r 'printf("php=%s\n", PHP_VERSION);' || true
 command -v composer >/dev/null 2>&1 && composer --version --no-ansi 2>/dev/null | head -n 1 || true
 command -v node >/dev/null 2>&1 && printf 'node=%s\n' "$(node --version)" || true
-command -v psql >/dev/null 2>&1 && psql --version 2>/dev/null || true
+command -v mysql >/dev/null 2>&1 && mysql --version 2>/dev/null || true
 command -v redis-cli >/dev/null 2>&1 && redis-cli --version 2>/dev/null || true
 command -v nginx >/dev/null 2>&1 && nginx -v 2>&1 || true
 

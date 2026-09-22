@@ -7,7 +7,7 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Git status inspected before and after changes.
 - Runtime and dependency versions match lock/config files.
 - Required native tools and PHP extensions are installed at compatible versions.
-- PostgreSQL, Redis, PHP-FPM, Nginx, queue, and scheduler are healthy when applicable.
+- MySQL, Redis, PHP-FPM, Nginx, queue, and scheduler are healthy when applicable.
 - Application and health endpoint respond over HTTP.
 - Direct browser access shows `Откройте приложение из Битрикс24`.
 - Forged launch data is rejected and a mocked valid `app.info` launch opens the empty application shell.
@@ -48,7 +48,7 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Application rollback was tested without destructive database rollback.
 - A fresh daily backup exists with at least seven-day retention.
 - Restore into an isolated test target completed and representative data/schema checks passed.
-- For PostgreSQL, the approved target, least-privilege user, and write probe were verified.
+- For MySQL, the approved target, least-privilege user, connection collation, and write probe were verified.
 - For `entity.*`, the app was installed on a dedicated test portal and live CRUD plus portal isolation passed.
 
 ## Reporting rule

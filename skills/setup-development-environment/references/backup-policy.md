@@ -11,7 +11,7 @@ Backups are mandatory for readiness.
 - Encrypt off-site backups and restrict provider credentials to the required bucket/path.
 - Monitor backup failures and storage capacity.
 
-CloudPanel documents nightly backups for its supported MySQL/MariaDB databases at 03:15 with seven-day retention and remote backups through Rclone-compatible providers. Do not apply that claim to PostgreSQL. For external managed PostgreSQL, verify the provider schedule and recovery target. For explicitly native PostgreSQL, configure a real scheduled `pg_dump`/snapshot process plus off-site copying.
+CloudPanel documents nightly backups for its supported MySQL/MariaDB databases at 03:15 with seven-day retention and remote backups through Rclone-compatible providers. Verify that the selected database is included, confirm the actual retention and last successful run, and perform an isolated restore drill. For external managed MySQL, verify the provider schedule and recovery target.
 
 For Bitrix24 `entity.*`, define a per-portal export/restore procedure for every application-owned entity. The portal is the recovery boundary. Verify that one portal can be exported and restored without overwriting another portal's data. Platform availability alone is not an application-level backup.
 

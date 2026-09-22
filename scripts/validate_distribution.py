@@ -25,7 +25,7 @@ def main():
         SKILL / "scripts" / "start_github_auth.sh",
         SKILL / "scripts" / "discover_cloudpanel_site_path.sh",
         SKILL / "scripts" / "verify_ssh_access.sh",
-        SKILL / "scripts" / "verify_postgresql.sh",
+        SKILL / "scripts" / "verify_mysql.sh",
         SKILL / "scripts" / "verify_tls.py",
         SKILL / "scripts" / "verify_backup_artifact.py",
         SKILL / "references" / "cloudpanel.md",
@@ -86,6 +86,20 @@ def main():
     missing_checkpoints = required_checkpoints - set(config.get("checkpoints", {}))
     if missing_checkpoints:
         fail(errors, f"example config is missing checkpoints: {sorted(missing_checkpoints)}")
+    expected_database = {"management": "cloudpanel", "host": "127.0.0.1", "port": 3306}
+    for key, expected in expected_database.items():
+        if config.get("database", {}).get(key) != expected:
+            fail(errors, f"example database.{key} must be {expected}")
+
+    removed_postgresql_paths = [
+        SKILL / "references" / "postgresql.md",
+        SKILL / "scripts" / "verify_postgresql.sh",
+        SKILL / "assets" / "env" / "postgresql.env.example.tpl",
+        SKILL / "assets" / "workflows" / "ci.postgresql.yml.tpl",
+    ]
+    for path in removed_postgresql_paths:
+        if path.exists():
+            fail(errors, f"removed PostgreSQL artifact still exists: {path.relative_to(ROOT)}")
 
     input_contract = (SKILL / "references" / "input-contract.md").read_text(encoding="utf-8")
     internal_instruction_url = "https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419"
@@ -107,7 +121,7 @@ def main():
         fail(errors, "GitHub repository checkpoint is missing the user-provided instruction URL")
 
     cloudpanel_text = (SKILL / "references" / "cloudpanel.md").read_text(encoding="utf-8")
-    for marker in ["Stock CloudPanel v2", "ED25519", "self-signed certificate"]:
+    for marker in ["Stock CloudPanel v2", "ED25519", "self-signed certificate", "MySQL database checkpoint"]:
         if marker not in cloudpanel_text:
             fail(errors, f"CloudPanel reference is missing requirement: {marker}")
     if internal_instruction_url not in cloudpanel_text:

@@ -27,8 +27,9 @@ class ValidateConfigTest(unittest.TestCase):
         self.config["server"]["production"]["enabled"] = False
         self.config["site"]["test_url"] = "https://test.example.com"
         self.config["database"].update({
-            "management": "external_managed",
-            "host": "postgres.example.net",
+            "management": "cloudpanel",
+            "host": "127.0.0.1",
+            "port": 3306,
             "name": "demo",
             "user": "demo_app",
         })
@@ -36,7 +37,7 @@ class ValidateConfigTest(unittest.TestCase):
         for checkpoint in self.config["checkpoints"]:
             self.config["checkpoints"][checkpoint] = True
 
-    def validate(self, config, profile="postgresql"):
+    def validate(self, config, profile="mysql"):
         with tempfile.NamedTemporaryFile("w", suffix=".json", encoding="utf-8") as handle:
             json.dump(config, handle)
             handle.flush()
@@ -48,7 +49,7 @@ class ValidateConfigTest(unittest.TestCase):
             )
         return result, json.loads(result.stdout)
 
-    def test_complete_postgresql_configuration_is_ready(self):
+    def test_complete_mysql_configuration_is_ready(self):
         result, payload = self.validate(self.config)
 
         self.assertEqual(0, result.returncode)
@@ -81,20 +82,20 @@ class ValidateConfigTest(unittest.TestCase):
         self.assertEqual("deploy_key", payload["next_step"]["id"])
         self.assertIn("server.test.path", payload["next_step"]["missing_fields"])
 
-    def test_rejects_claim_that_stock_cloudpanel_manages_postgresql(self):
-        self.config["database"]["management"] = "cloudpanel"
+    def test_rejects_native_database_management_for_mysql(self):
+        self.config["database"]["management"] = "native_explicit"
 
         result, payload = self.validate(self.config)
 
         self.assertEqual(1, result.returncode)
-        self.assertIn("stock CloudPanel does not manage PostgreSQL", payload["invalid"][0])
+        self.assertIn("cloudpanel or external_managed", payload["invalid"][0])
 
-    def test_server_local_postgresql_requests_only_name_and_user(self):
+    def test_cloudpanel_mysql_requests_only_name_and_user(self):
         config = copy.deepcopy(self.config)
         config["database"].update({
-            "management": "native_explicit",
+            "management": "cloudpanel",
             "host": "127.0.0.1",
-            "port": 5432,
+            "port": 3306,
             "name": "",
             "user": "",
         })
@@ -103,7 +104,7 @@ class ValidateConfigTest(unittest.TestCase):
         result, payload = self.validate(config)
 
         self.assertEqual(1, result.returncode)
-        self.assertEqual("postgresql", payload["next_step"]["id"])
+        self.assertEqual("mysql", payload["next_step"]["id"])
         self.assertEqual(
             ["database.name", "database.user"],
             payload["next_step"]["missing_fields"],
@@ -149,6 +150,12 @@ class ValidateConfigTest(unittest.TestCase):
 
         self.assertEqual(1, result.returncode)
         self.assertIn("at least 7", payload["invalid"][0])
+
+    def test_removed_postgresql_profile_is_rejected(self):
+        result, payload = self.validate(self.config, "postgresql")
+
+        self.assertEqual(2, result.returncode)
+        self.assertIn("mysql or bitrix24_entity", payload["invalid"][0])
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-PROFILES = {"postgresql", "bitrix24_entity"}
+PROFILES = {"mysql", "bitrix24_entity"}
 FIXED_VALUES = {
     "git.main_branch": "main",
     "git.test_branch": "test",
@@ -121,10 +121,13 @@ def stage_definitions(profile, production_enabled):
             ],
         },
     ]
-    if profile == "postgresql":
+    if profile == "mysql":
         stages.append({
-            "id": "postgresql",
+            "id": "mysql",
             "fields": [
+                "database.management",
+                "database.host",
+                "database.port",
                 "database.name",
                 "database.user",
             ],
@@ -226,9 +229,9 @@ def validate(data, profile):
             invalid.append(f"{field} must be an https URL")
 
     management = value_at(data, "database.management")
-    if profile == "postgresql" and management not in {None, "", "external_managed", "native_explicit"}:
+    if profile == "mysql" and management not in {None, "", "cloudpanel", "external_managed"}:
         invalid.append(
-            "database.management must be external_managed or native_explicit; stock CloudPanel does not manage PostgreSQL"
+            "database.management must be cloudpanel or external_managed for MySQL"
         )
     schedule = value_at(data, "backup.schedule")
     if schedule not in {None, "", "daily"}:
@@ -238,7 +241,7 @@ def validate(data, profile):
         if not isinstance(retention, int) or isinstance(retention, bool) or retention < 7:
             invalid.append("backup.retention_days must be an integer of at least 7")
     scope = value_at(data, "backup.scope")
-    expected_scope = "database" if profile == "postgresql" else "per_portal"
+    expected_scope = "database" if profile == "mysql" else "per_portal"
     if scope not in {None, "", expected_scope}:
         invalid.append(f"backup.scope must be {expected_scope} for {profile}")
 
@@ -290,7 +293,7 @@ def validate(data, profile):
             "name": "DEPLOY_BOOTSTRAP_PASSWORD",
             "handling": "transient_only",
         })
-    if profile == "postgresql":
+    if profile == "mysql":
         required_secrets.append({"environment": "test", "name": "DATABASE_PASSWORD"})
     else:
         required_secrets.extend([
@@ -308,7 +311,7 @@ def validate(data, profile):
                 "name": "DEPLOY_BOOTSTRAP_PASSWORD",
                 "handling": "transient_only",
             })
-        if profile == "postgresql":
+        if profile == "mysql":
             required_secrets.append({"environment": "production", "name": "DATABASE_PASSWORD"})
         else:
             required_secrets.extend([
@@ -331,13 +334,13 @@ def validate(data, profile):
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: validate_config.py <project-environment.json> <postgresql|bitrix24_entity>", file=sys.stderr)
+        print("Usage: validate_config.py <project-environment.json> <mysql|bitrix24_entity>", file=sys.stderr)
         return 2
 
     path = Path(sys.argv[1])
     profile = sys.argv[2].lower()
     if profile not in PROFILES:
-        print(json.dumps({"ok": False, "invalid": ["storage profile must be postgresql or bitrix24_entity"]}, ensure_ascii=False, indent=2))
+        print(json.dumps({"ok": False, "invalid": ["storage profile must be mysql or bitrix24_entity"]}, ensure_ascii=False, indent=2))
         return 2
 
     try:

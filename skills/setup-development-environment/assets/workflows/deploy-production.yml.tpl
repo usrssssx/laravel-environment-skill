@@ -36,7 +36,7 @@ jobs:
       - uses: __SETUP_PHP_ACTION__
         with:
           php-version: '__PHP_VERSION__'
-          extensions: bcmath, intl, mbstring, pcntl, pdo_pgsql, xml, zip
+          extensions: bcmath, intl, mbstring, pcntl, pdo_mysql, xml, zip
           coverage: none
       - uses: __SETUP_NODE_ACTION__
         with:

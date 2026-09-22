@@ -1,6 +1,6 @@
 ---
 name: setup-development-environment
-description: Guide a beginner through a verified native PHP/Laravel Bitrix24 environment, manual CloudPanel checkpoints, and GitHub Actions deployment without Docker. New applications include a server-validated Bitrix24 launch gate. Use to initialize a project, choose PostgreSQL or Bitrix24 entity.* storage, configure CloudPanel site access, deploy keys, TLS, backups, GitHub branches, and automatic test deployment. Do not use for ordinary feature development, Docker environments, or isolated CI fixes.
+description: Guide a beginner through a verified native PHP/Laravel Bitrix24 environment, manual CloudPanel checkpoints, and GitHub Actions deployment without Docker. New applications include a server-validated Bitrix24 launch gate. Use to initialize a project, choose MySQL or Bitrix24 entity.* storage, configure CloudPanel site access, deploy keys, TLS, backups, GitHub branches, and automatic test deployment. Do not use for ordinary feature development, Docker environments, or isolated CI fixes.
 ---
 
 # Setup Development Environment
@@ -11,9 +11,9 @@ Prepare the environment end to end. Create files, run proportional checks, confi
 
 Start with the storage decision unless the user already supplied it:
 
-> Какое хранилище использовать: PostgreSQL или Bitrix24 `entity.*`?
+> Какое хранилище использовать: MySQL или Bitrix24 `entity.*`?
 
-Accept `postgres`, `postgresql`, `pg` as `postgresql`; accept `entity`, `entity.*`, `bitrix24` as `bitrix24_entity`.
+Accept `mysql`, `mariadb`, `sql` as `mysql`; accept `entity`, `entity.*`, `bitrix24` as `bitrix24_entity`.
 
 After local preparation, work as a guided wizard. Run `scripts/validate_config.py`, inspect `next_step`, and ask for only that step. Give one short manual CloudPanel action, wait for the user's confirmation or values, verify the result technically, record the checkpoint internally, then continue. Do not front-load all infrastructure questions.
 
@@ -37,7 +37,7 @@ Read only the references needed for the selected path:
 - Before any CloudPanel or server step, read `references/cloudpanel.md` and `references/manual-checkpoints.md`.
 - Before backup setup or final readiness, read `references/backup-policy.md`.
 - For a new application or a requested Bitrix24-only browser gate, read `references/bitrix24-browser-gate.md`.
-- For PostgreSQL, read `references/postgresql.md`.
+- For MySQL, read `references/mysql.md`.
 - For Bitrix24 `entity.*`, read `references/bitrix24-entity.md`.
 - Before GitHub or server changes, read `references/autodeploy.md`.
 - Before final reporting, read `references/verification.md`.
@@ -57,13 +57,12 @@ Use files under `assets/` as starting points. Adapt them to the inspected projec
 
 Ask the single storage question only when the selection is absent from the user's request and config.
 
-For `postgresql`:
+For `mysql`:
 
-- when the user can provide only a database name, username, and password for the test server, infer server-local PostgreSQL at `127.0.0.1:5432`, record `database.management=native_explicit`, and do not ask for host or port;
-- use an external managed PostgreSQL host only when the user explicitly supplies or selects one;
-- never claim stock CloudPanel manages PostgreSQL: official CloudPanel v2 database features support MySQL/MariaDB, not PostgreSQL;
-- treat the user's request to use server-local credentials as authorization for the native PostgreSQL path, document that it is outside CloudPanel management, and require hardened loopback access, backup automation, and a restore drill;
-- configure Laravel's PostgreSQL driver;
+- use CloudPanel's database screen for the test-server database by default and record `database.management=cloudpanel`;
+- infer server-local MySQL at `127.0.0.1:3306` when CloudPanel supplies only the database name, username, and password; do not ask the user for host or port;
+- use an external managed MySQL-compatible host only when the user explicitly supplies or selects one;
+- configure Laravel's `mysql` driver and PDO MySQL extension;
 - create separate local and test databases;
 - use Laravel migrations;
 - document backup and restore commands.
@@ -82,7 +81,7 @@ For `bitrix24_entity`:
 1. Copy `assets/project-environment.example.json` to `project-environment.json` only if no config exists.
 2. Before adding infrastructure values, ensure `project-environment.json`, `environment-setup-report.md`, and `setup-required-inputs.md` are ignored by Git and are not tracked. If a fresh project accidentally tracked empty template versions, remove only those paths from the index while preserving the local files before recording hostnames, IPs, users, paths, or URLs.
 3. Fill values already discovered from the repository and environment.
-   For server-local PostgreSQL, fill `database.management=native_explicit`, `database.host=127.0.0.1`, and `database.port=5432` yourself. Ask the user only for the database name, username, and password; never store the password in JSON.
+   For a CloudPanel MySQL database, fill `database.management=cloudpanel`, `database.host=127.0.0.1`, and `database.port=3306` yourself. Ask the user only for the database name, username, and password; never store the password in JSON.
 4. Keep secrets out of this file. Treat server hostnames, IP addresses, usernames, paths, and operational checkpoint evidence as local infrastructure metadata even though they are not passwords.
 5. Run `scripts/validate_config.py project-environment.json <storage-profile>` after every completed checkpoint.
 6. Translate only `next_step` into a concise plain-text instruction or question. Do not expose validator JSON.
@@ -101,7 +100,7 @@ Required external secrets normally include:
 1. For a missing application, create a stable Laravel version compatible with the available PHP 8.x runtime, then install the starter files from `assets/starter/bitrix24-browser-gate/`.
 2. For an existing application, make the smallest environment-only changes.
 3. Configure Blade/Vite by default. Preserve or configure Vue 3 when detected or specified.
-4. Detect the operating system and available package manager. Install or configure PHP, required extensions, Composer, Node.js, PostgreSQL when selected, Redis when enabled, and local process controls without Docker.
+4. Detect the operating system and available package manager. Install or configure PHP, required extensions, Composer, Node.js, MySQL when selected, Redis when enabled, and local process controls without Docker.
 5. Create or adapt `.env.example`, PHP settings, queue worker, scheduler, logs, and health endpoint. Use `php artisan serve` or an existing native web server for local HTTP verification; do not create Dockerfiles or Compose files.
 6. Pin application dependencies and record installed runtime versions. Do not replace compatible existing runtimes unnecessarily.
 7. Keep `.env`, keys, tokens, dumps, and runtime data outside Git.
@@ -146,11 +145,11 @@ Required external secrets normally include:
 Run `references/verification.md` checks and the bundled scripts. At minimum verify:
 
 - required native runtime versions and PHP extensions;
-- PostgreSQL, Redis, PHP-FPM, Nginx, queue, and scheduler service health when applicable;
+- MySQL, Redis, PHP-FPM, Nginx, queue, and scheduler service health when applicable;
 - application HTTP response and health endpoint;
 - direct-access gate, rejected forged launch, successful mocked Bitrix24 launch, session expiry, and frame policy;
-- managed PostgreSQL target and real connection, or a real Bitrix24 test-portal installation plus live `entity.*` CRUD contract;
-- migrations for PostgreSQL;
+- CloudPanel or explicitly managed MySQL target and real connection, or a real Bitrix24 test-portal installation plus live `entity.*` CRUD contract;
+- migrations for MySQL;
 - backend tests and frontend production build;
 - queue and scheduler when enabled;
 - no tracked secrets via `scripts/check_secrets.sh`;

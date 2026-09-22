@@ -18,7 +18,7 @@ Create or adapt:
 
 Use pinned major actions or immutable SHAs according to repository policy. Set minimal `permissions`, job timeouts, concurrency groups, and explicit environments.
 
-CI must install locked dependencies, migrate a clean test database when PostgreSQL is selected, run backend tests, run frontend production build, and validate the deploy artifact.
+CI must install locked dependencies, migrate a clean test database when MySQL is selected, run backend tests, run frontend production build, and validate the deploy artifact.
 
 ## Secrets and variables
 
@@ -46,7 +46,7 @@ For CloudPanel, the user creates the deploy identity and installs the generated 
 - Use a dedicated least-privilege deploy user.
 - Use versioned immutable release archives; do not build or deploy container images.
 - Install application dependencies and build frontend assets in CI before packaging.
-- Run Nginx, PHP-FPM, PostgreSQL/Redis, queue workers, and the scheduler as native server services.
+- Run Nginx, PHP-FPM, MySQL/Redis, queue workers, and the scheduler as native server services.
 - Keep runtime `.env`, persistent storage, and backups outside the release directory.
 - Perform preflight checks, backup when required, migrations, cache refresh, queue restart, health checks, and log inspection.
 - Keep the previous successful release available.

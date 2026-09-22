@@ -37,16 +37,18 @@ Do not ask for a password by default. Use temporary password bootstrap only when
 
 If CloudPanel cannot grant the additional user safe access to the existing site directory, stop. Do not silently deploy under the user's separate home directory. Resolve ownership/ACL policy with the server administrator or use the existing site user as an explicitly approved exception.
 
-## PostgreSQL compatibility boundary
+## MySQL database checkpoint
 
-Stock CloudPanel v2 documents MySQL and MariaDB management; its database UI, `clpctl db:*`, phpMyAdmin, and built-in database backup process are not PostgreSQL management tools. Therefore:
+Stock CloudPanel v2 manages MySQL/MariaDB databases through its database screen and phpMyAdmin. For the `mysql` profile:
 
-- do not tell the user to create PostgreSQL in the CloudPanel Databases screen unless their installed/custom edition demonstrably supports it;
-- when the user provides only a database name, username, and password for this server, use loopback `127.0.0.1:5432` and record `database.management=native_explicit` without asking for host or port;
-- use an external managed PostgreSQL service and record `database.management=external_managed` only when the user explicitly supplies or selects an external host;
-- never report PostgreSQL as "CloudPanel-managed" without a verified provider capability.
+- show the user-provided instruction link first, then ask the user to create a database assigned to the test site;
+- ask only for the generated database name, database username, and database password;
+- infer `127.0.0.1:3306` and record `database.management=cloudpanel`; do not ask the user for host or port;
+- use Laravel's `mysql` driver for either MySQL or a CloudPanel-provided compatible MariaDB server;
+- treat the password as transient input and place it only in the protected runtime `.env`; never copy it to project metadata, reports, Git, or later responses;
+- verify the connection, current database/user, server version, character set/collation, and a rolled-back write transaction before completing the checkpoint.
 
-If the project is allowed to switch to MySQL/MariaDB, that is a new architecture decision and requires explicit user approval; this skill must not make the switch silently.
+Use `database.management=external_managed` only when the user explicitly supplies an external MySQL-compatible service. Do not install another MySQL server on a CloudPanel host that already provides one.
 
 ## TLS checkpoint
 

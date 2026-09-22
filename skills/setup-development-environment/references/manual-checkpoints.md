@@ -17,7 +17,7 @@ Use this protocol for every CloudPanel action.
 3. `deploy_public_key_installed`: the public key shown by the skill was added while creating or configuring that user; password bootstrap is fallback-only.
 4. `deploy_key_login_verified`: key-only SSH succeeds; the skill discovers the site path over SSH and verifies it is writable without broad privileges.
 5. Storage checkpoint:
-   - PostgreSQL: credentials target the approved service and `database_connection_verified` passes.
+   - MySQL: the CloudPanel database credentials target the approved database and `database_connection_verified` passes.
    - Bitrix24: application is installed on a dedicated test portal and `bitrix24_test_installation_verified` passes.
 6. `entity_contract_verified` for `entity.*`: live create/read/update/delete and portal isolation checks pass.
 7. `tls_verified`: trusted certificate, hostname, validity, and HTTPS redirect pass.
