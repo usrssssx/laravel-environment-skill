@@ -34,4 +34,4 @@ Configure MySQL as Laravel's primary application database. A CloudPanel-provided
 - Verify current database, current user, server version, `utf8mb4`, and collation.
 - Run migrations on clean local and test databases.
 - Run a safe write transaction and roll it back.
-- Verify a daily backup, at least seven recovery points, a fresh artifact, and an isolated restore drill as defined in `backup-policy.md`.
+- Verify a daily backup, retention of no more than five days, a fresh artifact, and an isolated restore drill as defined in `backup-policy.md`.

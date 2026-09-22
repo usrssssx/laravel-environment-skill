@@ -238,8 +238,8 @@ def validate(data, profile):
         invalid.append("backup.schedule must be daily")
     retention = value_at(data, "backup.retention_days")
     if retention is not None:
-        if not isinstance(retention, int) or isinstance(retention, bool) or retention < 7:
-            invalid.append("backup.retention_days must be an integer of at least 7")
+        if not isinstance(retention, int) or isinstance(retention, bool) or not 1 <= retention <= 5:
+            invalid.append("backup.retention_days must be an integer from 1 to 5")
     scope = value_at(data, "backup.scope")
     expected_scope = "database" if profile == "mysql" else "per_portal"
     if scope not in {None, "", expected_scope}:

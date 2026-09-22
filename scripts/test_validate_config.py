@@ -143,13 +143,22 @@ class ValidateConfigTest(unittest.TestCase):
             payload["next_step"]["incomplete_checkpoints"],
         )
 
-    def test_daily_backup_retention_must_be_at_least_seven_days(self):
-        self.config["backup"]["retention_days"] = 2
+    def test_daily_backup_retention_must_not_exceed_five_days(self):
+        self.config["backup"]["retention_days"] = 7
 
         result, payload = self.validate(self.config)
 
         self.assertEqual(1, result.returncode)
-        self.assertIn("at least 7", payload["invalid"][0])
+        self.assertIn("from 1 to 5", payload["invalid"][0])
+
+    def test_daily_backup_retention_accepts_one_to_five_days(self):
+        for days in range(1, 6):
+            with self.subTest(days=days):
+                config = copy.deepcopy(self.config)
+                config["backup"]["retention_days"] = days
+                result, payload = self.validate(config)
+                self.assertEqual(0, result.returncode)
+                self.assertTrue(payload["ok"])
 
     def test_removed_postgresql_profile_is_rejected(self):
         result, payload = self.validate(self.config, "postgresql")

@@ -50,7 +50,7 @@
     "provider": "",
     "scope": "",
     "schedule": "daily",
-    "retention_days": 7
+    "retention_days": 5
   },
   "deployment": {
     "test_on_push": true,

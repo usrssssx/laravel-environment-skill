@@ -136,7 +136,7 @@ Required external secrets normally include:
 7. Build an immutable release archive. Deploy the same archive to test and production; do not use container images.
 8. Configure GitHub Environments and populate secrets/variables only after key-only SSH succeeds. Require approval for production.
 9. Ask the user to issue a trusted certificate in CloudPanel. Verify hostname, chain, remaining validity, and HTTP-to-HTTPS redirect with `scripts/verify_tls.py`; a self-signed certificate does not pass.
-10. Verify a daily backup, retention of at least seven days, an accessible nonempty backup artifact, and a restore drill into an isolated test target. Use `scripts/verify_backup_artifact.py` when the artifact is filesystem-accessible.
+10. Verify a daily backup, retention from one to five days, an accessible nonempty backup artifact, and a restore drill into an isolated test target. The retention period must never exceed five days. Use `scripts/verify_backup_artifact.py` when the artifact is filesystem-accessible.
 11. Push `test` only when the requested external mutation is authorized and local checks pass. Run a real test deployment, external health check, revision comparison, and rollback test.
 12. Prepare production automation but do not trigger a production deployment without explicit authorization.
 

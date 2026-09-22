@@ -5,13 +5,13 @@ Backups are mandatory for readiness.
 ## Minimum standard
 
 - Run at least daily during a low-traffic window.
-- Retain at least seven daily recovery points unless the project standard requires more.
+- Retain daily recovery points for no more than five days. Use five days by default; values from one through five are valid.
 - Keep backups outside versioned release directories and outside the primary database storage.
 - Separate projects/portals sufficiently that one recovery can be performed without restoring every customer.
 - Encrypt off-site backups and restrict provider credentials to the required bucket/path.
 - Monitor backup failures and storage capacity.
 
-CloudPanel documents nightly backups for its supported MySQL/MariaDB databases at 03:15 with seven-day retention and remote backups through Rclone-compatible providers. Verify that the selected database is included, confirm the actual retention and last successful run, and perform an isolated restore drill. For external managed MySQL, verify the provider schedule and recovery target.
+CloudPanel may have a longer default retention than this project permits. Configure CloudPanel or the selected backup provider to keep daily MySQL/MariaDB backups for no more than five days. Verify that the selected database is included, confirm the actual retention and last successful run, and perform an isolated restore drill. For external managed MySQL, verify the provider schedule and recovery target.
 
 For Bitrix24 `entity.*`, define a per-portal export/restore procedure for every application-owned entity. The portal is the recovery boundary. Verify that one portal can be exported and restored without overwriting another portal's data. Platform availability alone is not an application-level backup.
 

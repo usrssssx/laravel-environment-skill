@@ -90,6 +90,8 @@ def main():
     for key, expected in expected_database.items():
         if config.get("database", {}).get(key) != expected:
             fail(errors, f"example database.{key} must be {expected}")
+    if config.get("backup", {}).get("retention_days") != 5:
+        fail(errors, "example backup.retention_days must be 5")
 
     removed_postgresql_paths = [
         SKILL / "references" / "postgresql.md",

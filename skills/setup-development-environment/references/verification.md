@@ -46,7 +46,7 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Deployed revision equals the expected commit/digest.
 - Storage, Redis, queue, scheduler, and logs were checked.
 - Application rollback was tested without destructive database rollback.
-- A fresh daily backup exists with at least seven-day retention.
+- A fresh daily backup exists with a retention period from one to five days.
 - Restore into an isolated test target completed and representative data/schema checks passed.
 - For MySQL, the approved target, least-privilege user, connection collation, and write probe were verified.
 - For `entity.*`, the app was installed on a dedicated test portal and live CRUD plus portal isolation passed.
