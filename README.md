@@ -1,6 +1,6 @@
 # Laravel Environment Skill
 
-A reusable Codex skill that prepares and verifies a native PHP/Laravel Bitrix24 application, including a secure browser-entry gate and GitHub Actions deployment pipeline without Docker.
+A reusable Codex skill that guides a beginner through a verified native PHP/Laravel Bitrix24 application, manual CloudPanel checkpoints, and GitHub Actions deployment without Docker.
 
 ## Capabilities
 
@@ -12,6 +12,9 @@ A reusable Codex skill that prepares and verifies a native PHP/Laravel Bitrix24 
 - configures native PHP, Composer, Node.js, Redis, Nginx, PHP-FPM, queue workers, and scheduler services;
 - uses `main` for production and `test` for integration and test deployment;
 - prepares GitHub Actions, immutable release archives, test deployment, health checks, and application rollback;
+- guides CloudPanel site, deploy-user, ED25519 key, and trusted TLS setup one step at a time;
+- requires daily backups and a real isolated restore drill;
+- requires a managed PostgreSQL target or a live Bitrix24 `entity.*` test-portal contract;
 - prevents secrets from entering Git or deployment artifacts;
 - never starts a production deployment without explicit authorization.
 
@@ -33,7 +36,9 @@ Use $setup-development-environment to prepare the current project,
 GitHub repository, and test deployment. Do not deploy to production.
 ```
 
-The skill intentionally uses explicit invocation. It will first inspect the project and ask at most one architecture question: PostgreSQL or Bitrix24 `entity.*`. Before it finishes, missing GitHub URL, server IP/host, SSH user, password or key access, deployment path, and site URL are requested once in ordinary text. The user never has to provide JSON. A server password is treated as a transient secret and is replaced with a dedicated deploy key for GitHub Actions.
+The skill intentionally uses explicit invocation. It first asks for PostgreSQL or Bitrix24 `entity.*`, prepares the local project, and then requests one manual checkpoint at a time. The user never has to provide JSON. CloudPanel browser actions remain manual; Codex verifies each result and automates GitHub and deployment only after ED25519 key access works.
+
+Stock CloudPanel manages MySQL/MariaDB, not PostgreSQL. When PostgreSQL is selected, the skill requires an external managed PostgreSQL service by default or explicit authorization for a separately administered native installation.
 
 ## Requirements
 

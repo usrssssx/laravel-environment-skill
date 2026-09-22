@@ -13,15 +13,17 @@ Set up local and server runtimes without Docker, Compose, or container images.
 - Bind PostgreSQL and Redis to loopback unless remote access is explicitly required and secured.
 - Create separate application and test databases. Never reuse a production database for local tests.
 
-## Linux server
+## Linux server and CloudPanel
 
-- Install Nginx, PHP CLI/FPM with required extensions, and Redis/PostgreSQL when the selected architecture hosts them on that server.
+- When CloudPanel is present, preserve its Nginx, PHP-FPM, site users, paths, and certificate management. Do not replace panel-managed services with generic templates blindly.
+- Install missing PHP extensions and Redis only after checking compatibility with the panel-managed runtime. PostgreSQL is not a stock CloudPanel-managed database.
 - Do not install Node.js or Composer on the server when the release archive already contains built frontend assets and `vendor/`.
 - Keep Nginx and PHP-FPM under systemd. Use the templates in `assets/server/` for the site, queue worker, scheduler service, and timer; resolve every placeholder against the inspected server.
 - Use a dedicated deploy user. Grant only the narrowly scoped permissions needed for release directories and approved service reloads.
 - Keep `shared/.env`, `shared/storage`, and backups outside versioned releases. Point Nginx at `<deploy-path>/current/public`.
 - Validate Nginx configuration before reload. Enable and verify PHP-FPM, Nginx, queue, and scheduler units.
 - Configure TLS using the server's established certificate process. Do not expose PostgreSQL or Redis publicly.
+- Require the user to perform CloudPanel UI mutations manually, then verify them through SSH and external checks.
 
 ## Verification
 

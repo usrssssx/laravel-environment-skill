@@ -39,6 +39,8 @@ Store `DEPLOY_KNOWN_HOSTS` as a secret or protected variable according to reposi
 
 If the server initially exposes only password authentication, accept `DEPLOY_BOOTSTRAP_PASSWORD` only as a transient local setup secret. Verify the server host key out of band, connect once, install a dedicated least-privilege deploy public key, verify key-only login, then discard the password from the process environment. Never use password authentication from GitHub Actions.
 
+For CloudPanel, the user creates the deploy identity and installs the generated public key manually. Use `generate_deploy_key.sh` and `verify_ssh_access.sh`. Configure GitHub only after key-only login succeeds. Verify that `DEPLOY_PATH` is the actual site path and not the deploy user's unrelated home directory.
+
 ## Server deployment
 
 - Use a dedicated least-privilege deploy user.

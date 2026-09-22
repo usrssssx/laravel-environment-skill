@@ -5,18 +5,20 @@
 1. Inspect current state and preserve user changes.
 2. Resolve the storage profile using the single permitted decision question.
 3. Discover Git and project values.
-4. Validate `project-environment.json` and collect missing infrastructure data once.
+4. Validate `project-environment.json` and use only its `next_step`.
 5. Prepare Laravel and native local runtime services.
 6. Configure the selected storage profile.
 7. Add tests, logs, queue, scheduler, and health checks.
 8. Run all local checks.
-9. Prepare GitHub Actions and repository settings.
-10. Prepare the test server.
-11. Configure GitHub Secrets and Environments through authenticated tooling.
-12. Run a real test deployment and verify it.
-13. Prepare controlled production deployment without triggering it.
-14. Revalidate the GitHub URL, enabled server data, site URL, and bootstrap credential. If any are missing and deployment was not excluded, request them in one ordinary plain-text chat message and pause. Never require JSON from the user.
-15. Produce the final report only after external setup is completed or the user explicitly limits the task to local setup.
+9. Guide the user through CloudPanel site creation and verify it.
+10. Guide deploy-user and ED25519 key installation, then verify key-only access and site-path permissions.
+11. Configure and verify PostgreSQL, or deploy and verify the Bitrix24 test-portal installation and live `entity.*` contract.
+12. Guide trusted-certificate issuance and verify TLS.
+13. Configure GitHub Actions, secrets, environments, and repository settings.
+14. Run and verify real test deployment and rollback.
+15. Verify daily backup and an isolated restore drill.
+16. Prepare controlled production deployment without triggering it.
+17. Revalidate all checkpoints and produce the final report.
 
 ## Existing-project rule
 
@@ -29,7 +31,7 @@ Prefer existing compatible conventions. Do not upgrade major framework/runtime v
 - native PHP, Composer, and Node.js toolchain
 - Nginx + PHP-FPM
 - Redis for cache/queue when enabled
-- native PostgreSQL when selected
+- native PostgreSQL for local development when selected; server PostgreSQL is managed externally by default or explicitly administered outside CloudPanel
 - systemd-managed queue and scheduler processes on Linux servers
 - GitHub Actions CI
 - `main` and `test` branches, with `test` active for routine development
@@ -44,3 +46,4 @@ Prefer existing compatible conventions. Do not upgrade major framework/runtime v
 - Never generate or rotate live secrets without authorization.
 - Do not run production deployment as part of setup.
 - External changes require accessible credentials and may trigger platform approval.
+- CloudPanel browser actions remain manual. Give one action at a time and verify it before continuing.

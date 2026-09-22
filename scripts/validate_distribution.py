@@ -21,6 +21,14 @@ def main():
         SKILL / "assets" / "project-environment.example.json",
         SKILL / "scripts" / "preflight.sh",
         SKILL / "scripts" / "validate_config.py",
+        SKILL / "scripts" / "generate_deploy_key.sh",
+        SKILL / "scripts" / "verify_ssh_access.sh",
+        SKILL / "scripts" / "verify_postgresql.sh",
+        SKILL / "scripts" / "verify_tls.py",
+        SKILL / "scripts" / "verify_backup_artifact.py",
+        SKILL / "references" / "cloudpanel.md",
+        SKILL / "references" / "manual-checkpoints.md",
+        SKILL / "references" / "backup-policy.md",
         SKILL / "references" / "bitrix24-browser-gate.md",
         SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "bootstrap" / "app.php.tpl",
         SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "routes" / "web.php.tpl",
@@ -63,12 +71,25 @@ def main():
     for environment in ["test", "production"]:
         if "auth_method" not in config.get("server", {}).get(environment, {}):
             fail(errors, f"example config must include server.{environment}.auth_method")
+    required_checkpoints = {
+        "cloudpanel_site_created",
+        "deploy_user_created",
+        "deploy_public_key_installed",
+        "deploy_key_login_verified",
+        "tls_verified",
+        "backup_created",
+        "restore_drill_verified",
+        "test_deployment_verified",
+    }
+    missing_checkpoints = required_checkpoints - set(config.get("checkpoints", {}))
+    if missing_checkpoints:
+        fail(errors, f"example config is missing checkpoints: {sorted(missing_checkpoints)}")
 
     input_contract = (SKILL / "references" / "input-contract.md").read_text(encoding="utf-8")
     completion_requirements = {
         "GitHub repository URL request": "git.repository_url",
         "server bootstrap password request": "DEPLOY_BOOTSTRAP_PASSWORD",
-        "plain-text user response": "answer one ordinary message",
+        "stepwise collection": "Request only the current validator `next_step`",
         "no user-facing JSON": "Do not ask the user for JSON",
     }
     for label, marker in completion_requirements.items():
@@ -76,6 +97,11 @@ def main():
             fail(errors, f"missing pre-completion requirement: {label}")
     if "```json" in input_contract:
         fail(errors, "input contract must not show a user-facing JSON block")
+
+    cloudpanel_text = (SKILL / "references" / "cloudpanel.md").read_text(encoding="utf-8")
+    for marker in ["Stock CloudPanel v2", "ED25519", "self-signed certificate"]:
+        if marker not in cloudpanel_text:
+            fail(errors, f"CloudPanel reference is missing requirement: {marker}")
 
     starter = SKILL / "assets" / "starter" / "bitrix24-browser-gate"
     controller_text = (starter / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl").read_text(encoding="utf-8")

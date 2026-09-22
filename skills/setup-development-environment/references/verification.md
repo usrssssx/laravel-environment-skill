@@ -37,11 +37,19 @@ Record commands and outcomes in `environment-setup-report.md`.
 
 ## Test server
 
+- CloudPanel PHP site exists with the expected primary site user and actual site path.
+- Dedicated deploy user is restricted to the target site.
+- ED25519 public key is installed; key-only SSH and scoped write access pass.
 - Test workflow completed successfully.
 - External HTTPS health check passed.
+- Trusted TLS certificate matches the hostname, has acceptable remaining validity, and HTTP redirects to HTTPS.
 - Deployed revision equals the expected commit/digest.
 - Storage, Redis, queue, scheduler, and logs were checked.
 - Application rollback was tested without destructive database rollback.
+- A fresh daily backup exists with at least seven-day retention.
+- Restore into an isolated test target completed and representative data/schema checks passed.
+- For PostgreSQL, the approved target, least-privilege user, and write probe were verified.
+- For `entity.*`, the app was installed on a dedicated test portal and live CRUD plus portal isolation passed.
 
 ## Reporting rule
 

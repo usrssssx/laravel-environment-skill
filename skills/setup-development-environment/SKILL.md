@@ -1,6 +1,6 @@
 ---
 name: setup-development-environment
-description: Prepare and verify a complete native PHP 8.x/Laravel Bitrix24 application environment and GitHub Actions deployment pipeline without Docker. New applications include a server-validated Bitrix24 launch gate that blocks direct browser access. Use when the user asks to initialize a new project, standardize an existing Laravel workspace, choose PostgreSQL or Bitrix24 entity.* storage, configure GitHub branches and secrets, prepare a Linux server with Nginx and PHP-FPM, or set up automatic test and controlled production deployment. Do not use for ordinary feature development, Docker-based environments, or isolated CI fixes.
+description: Guide a beginner through a verified native PHP/Laravel Bitrix24 environment, manual CloudPanel checkpoints, and GitHub Actions deployment without Docker. New applications include a server-validated Bitrix24 launch gate. Use to initialize a project, choose PostgreSQL or Bitrix24 entity.* storage, configure CloudPanel site access, deploy keys, TLS, backups, GitHub branches, and automatic test deployment. Do not use for ordinary feature development, Docker environments, or isolated CI fixes.
 ---
 
 # Setup Development Environment
@@ -9,20 +9,17 @@ Prepare the environment end to end. Create files, run proportional checks, confi
 
 ## Interaction contract
 
-Ask at most one decision question unless the user already supplied the answer:
+Start with the storage decision unless the user already supplied it:
 
 > Какое хранилище использовать: PostgreSQL или Bitrix24 `entity.*`?
 
 Accept `postgres`, `postgresql`, `pg` as `postgresql`; accept `entity`, `entity.*`, `bitrix24` as `bitrix24_entity`.
 
-Do not ask separate questions about Git, server, domain, or deployment. Discover values first, then request all missing infrastructure values once in one plain-language chat message. The user must be able to reply with ordinary prose or simple `Поле: значение` lines. Never require, show, or ask the user to edit JSON. Convert the answer into the internal `project-environment.json` yourself. Data collection is one consolidated request, not an interview. Do not ask follow-up questions field by field when the answer can be parsed reasonably.
+After local preparation, work as a guided wizard. Run `scripts/validate_config.py`, inspect `next_step`, and ask for only that step. Give one short manual CloudPanel action, wait for the user's confirmation or values, verify the result technically, record the checkpoint internally, then continue. Do not front-load all infrastructure questions.
 
-Before ending the setup, run the configuration validator again. Unless the user explicitly requested local-only setup or declined deployment, do not issue the final completion response while the GitHub repository URL, enabled server connection data, site URL, or bootstrap SSH credential is missing. Pause with one consolidated request containing:
+The user may answer with ordinary prose or `Поле: значение` lines. Never require, show, or ask the user to edit JSON. Convert answers into the internal `project-environment.json` yourself. Do not repeat a question when the answer can be parsed reasonably.
 
-- GitHub repository URL;
-- server IP/host, SSH port, SSH user, deployment path, and authentication method;
-- public HTTPS site URL;
-- SSH password when password authentication is selected.
+Do not automate CloudPanel through browser UI. Manual control-panel actions are intentionally user-owned because UI access and layouts vary. Link the relevant official instruction, describe the exact expected result, and perform command-line or HTTPS verification afterward.
 
 When password authentication is selected, accept the password in the user's ordinary chat response as the transient `DEPLOY_BOOTSTRAP_PASSWORD`. Do not repeat it in later messages. Never place its value in JSON, generated Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
 
@@ -35,6 +32,8 @@ System approval prompts for external or privileged actions are not user-design q
 Read only the references needed for the selected path:
 
 - Always read `references/input-contract.md`, `references/workflow.md`, and `references/native-environment.md`.
+- Before any CloudPanel or server step, read `references/cloudpanel.md` and `references/manual-checkpoints.md`.
+- Before backup setup or final readiness, read `references/backup-policy.md`.
 - For a new application or a requested Bitrix24-only browser gate, read `references/bitrix24-browser-gate.md`.
 - For PostgreSQL, read `references/postgresql.md`.
 - For Bitrix24 `entity.*`, read `references/bitrix24-entity.md`.
@@ -58,7 +57,9 @@ Ask the single storage question only when the selection is absent from the user'
 
 For `postgresql`:
 
-- provision PostgreSQL as a native local service or use an existing reachable PostgreSQL instance;
+- use a dedicated managed PostgreSQL service by default;
+- never claim stock CloudPanel manages PostgreSQL: official CloudPanel v2 database features support MySQL/MariaDB, not PostgreSQL;
+- if the user explicitly chooses native PostgreSQL, document that it is outside CloudPanel management and require explicit authorization, hardened access, backup automation, and a restore drill;
 - configure Laravel's PostgreSQL driver;
 - create separate local and test databases;
 - use Laravel migrations;
@@ -78,10 +79,10 @@ For `bitrix24_entity`:
 1. Copy `assets/project-environment.example.json` to `project-environment.json` only if no config exists.
 2. Fill values already discovered from the repository and environment.
 3. Keep secrets out of this file.
-4. Run `scripts/validate_config.py project-environment.json <storage-profile>`.
-5. If required values are missing, use the validator output only as an internal checklist and translate it into one concise plain-text request. Do not expose its JSON response to the user.
+4. Run `scripts/validate_config.py project-environment.json <storage-profile>` after every completed checkpoint.
+5. Translate only `next_step` into a concise plain-text instruction or question. Do not expose validator JSON.
 6. Accept a bootstrap SSH password in the user's chat response when needed; treat it as transient sensitive input and never copy it into project files or reports. Obtain long-lived secrets from existing GitHub Environment Secrets, protected process environment variables, or an approved secure input channel. Never request that secrets be committed to a file.
-7. If local setup finishes before infrastructure data is available, create `setup-required-inputs.md` and make the consolidated infrastructure request before stopping. Resume GitHub, server, and real test-deploy setup when the user responds.
+7. When a manual checkpoint is needed, explain the action, expected result, and how it will be verified. Pause there. Resume from the saved checkpoint when the user responds.
 
 Required external secrets normally include:
 
@@ -121,15 +122,18 @@ Required external secrets normally include:
 
 ## Phase 6: prepare server and deployment
 
-1. Read `references/autodeploy.md` fully.
-2. Create CI, test deployment, and controlled production deployment workflows.
-3. Copy and adapt the project scripts from `assets/project-scripts/`; copy `scripts/check_deploy_artifact.sh` into the target project's `scripts/check-deploy-artifact.sh` when using the release-archive templates.
-4. Build an immutable release archive. Deploy the same archive to test and production; do not use container images.
-5. Configure GitHub Environments `test` and `production`; require approval for production.
-6. Prepare a least-privilege deploy user, Nginx, PHP-FPM, native PostgreSQL/Redis where required, systemd queue and scheduler units, known-host verification, release directories, shared storage, server `.env`, TLS, logs, backup, and health checks.
-7. Push `test` only when the requested external mutation is authorized and local checks pass.
-8. Run and verify a real test deployment when access exists.
-9. Prepare production automation but do not trigger a real production deployment without explicit authorization.
+1. Read `references/cloudpanel.md`, `references/manual-checkpoints.md`, `references/backup-policy.md`, and `references/autodeploy.md` fully.
+2. Ask the user to create or confirm the CloudPanel PHP site and primary site user. Verify the domain, site path, PHP version, and that the document root can point to the Laravel `public` directory.
+3. Ask the user to create a separate least-privilege deploy SSH user assigned only to the site. Generate an ED25519 key with `scripts/generate_deploy_key.sh`, show only the public key, ask the user to add it in CloudPanel, then verify key-only access and path permissions with `scripts/verify_ssh_access.sh`.
+4. Do not deploy into the deploy user's home by assumption. Confirm the actual CloudPanel site path and ownership. Stop if the deploy user cannot safely write release directories under that site path.
+5. Create CI, test deployment, and controlled production deployment workflows.
+6. Copy and adapt the project scripts from `assets/project-scripts/`; copy `scripts/check_deploy_artifact.sh` into the target project's `scripts/check-deploy-artifact.sh` when using the release-archive templates.
+7. Build an immutable release archive. Deploy the same archive to test and production; do not use container images.
+8. Configure GitHub Environments and populate secrets/variables only after key-only SSH succeeds. Require approval for production.
+9. Ask the user to issue a trusted certificate in CloudPanel. Verify hostname, chain, remaining validity, and HTTP-to-HTTPS redirect with `scripts/verify_tls.py`; a self-signed certificate does not pass.
+10. Verify a daily backup, retention of at least seven days, an accessible nonempty backup artifact, and a restore drill into an isolated test target. Use `scripts/verify_backup_artifact.py` when the artifact is filesystem-accessible.
+11. Push `test` only when the requested external mutation is authorized and local checks pass. Run a real test deployment, external health check, revision comparison, and rollback test.
+12. Prepare production automation but do not trigger a production deployment without explicit authorization.
 
 ## Phase 7: verify
 
@@ -139,14 +143,17 @@ Run `references/verification.md` checks and the bundled scripts. At minimum veri
 - PostgreSQL, Redis, PHP-FPM, Nginx, queue, and scheduler service health when applicable;
 - application HTTP response and health endpoint;
 - direct-access gate, rejected forged launch, successful mocked Bitrix24 launch, session expiry, and frame policy;
-- storage connection or Bitrix24 adapter contract tests;
+- managed PostgreSQL target and real connection, or a real Bitrix24 test-portal installation plus live `entity.*` CRUD contract;
 - migrations for PostgreSQL;
 - backend tests and frontend production build;
 - queue and scheduler when enabled;
 - no tracked secrets via `scripts/check_secrets.sh`;
 - deploy artifact contents via `scripts/check_deploy_artifact.sh`;
 - GitHub workflow result and deployed commit on test when accessible;
-- application rollback on test when deployment was configured.
+- application rollback on test when deployment was configured;
+- CloudPanel site path, separate deploy user, installed ED25519 public key, key-only login, and least-privilege write access;
+- trusted TLS certificate and HTTP-to-HTTPS redirect;
+- daily backup, retention, fresh artifact, and isolated restore drill.
 
 Fix in-scope failures and rerun the failed checks. Do not mark unexecuted checks as successful.
 
@@ -170,6 +177,6 @@ Create `environment-setup-report.md` containing:
 - completion state;
 - exact remaining blockers.
 
-For `LOCAL_READY`, include the exact consolidated GitHub/server request in both `setup-required-inputs.md` and the user-facing response. Do not merely list missing field names. Omit this request only when deployment was explicitly excluded by the user.
+For `LOCAL_READY`, include only the next required manual checkpoint in `setup-required-inputs.md` and the user-facing response. Do not overwhelm the user with all later steps. Omit it only when deployment was explicitly excluded.
 
 Do not say "автодеплой настроен" unless a real test deployment and external health check succeeded.

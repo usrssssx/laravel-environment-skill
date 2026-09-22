@@ -2,6 +2,15 @@
 
 Configure PostgreSQL as Laravel's primary application database.
 
+## Management boundary
+
+Stock CloudPanel v2 does not manage PostgreSQL. Its documented database UI and backup commands are for MySQL/MariaDB. Use one of these explicit modes:
+
+- `external_managed` (default): a dedicated PostgreSQL database from a managed provider;
+- `native_explicit`: PostgreSQL installed outside CloudPanel's database management, only with explicit authorization and a documented owner, hardening, monitoring, backup, and restore process.
+
+Never label native PostgreSQL as CloudPanel-managed. If the user wants CloudPanel's database UI, switching to MySQL/MariaDB is a separate architecture decision.
+
 ## Local environment
 
 - Install PostgreSQL as a native local service or use an existing reachable instance.
@@ -22,6 +31,9 @@ Configure PostgreSQL as Laravel's primary application database.
 
 ## Deployment
 
+- Create a dedicated database and least-privilege application user; never use provider/master credentials in Laravel.
+- Collect host, port, database name, and user only at the PostgreSQL checkpoint. Treat the password as a transient secret and place it only in the protected server `.env` and approved environment secrets.
+- Run `scripts/verify_postgresql.sh` and record the returned database, user, server address, version, and successful rolled-back write probe.
 - Back up production before potentially destructive changes.
 - Prefer expand/contract migrations across releases.
 - Analyze locks and runtime for large table changes.
@@ -35,3 +47,4 @@ Configure PostgreSQL as Laravel's primary application database.
 - Run migrations on clean local and test databases.
 - Run a safe read/write transaction.
 - Verify backup creation and a restore drill on test before claiming readiness.
+- Verify a daily schedule, at least seven recovery points, a fresh artifact/snapshot, and an isolated restore. Read `backup-policy.md`.

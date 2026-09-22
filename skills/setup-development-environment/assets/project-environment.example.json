@@ -18,11 +18,12 @@
       "host": "",
       "port": 22,
       "user": "",
+      "site_user": "",
       "path": "",
       "auth_method": ""
     },
     "production": {
-      "enabled": true,
+      "enabled": false,
       "host": "",
       "port": 22,
       "user": "",
@@ -34,6 +35,23 @@
     "test_url": "",
     "production_url": ""
   },
+  "control_panel": {
+    "type": "cloudpanel",
+    "manual_only": true
+  },
+  "database": {
+    "management": "",
+    "host": "",
+    "port": 5432,
+    "name": "",
+    "user": ""
+  },
+  "backup": {
+    "provider": "",
+    "scope": "",
+    "schedule": "daily",
+    "retention_days": 7
+  },
   "deployment": {
     "test_on_push": true,
     "production_trigger": "tag",
@@ -44,7 +62,21 @@
   "bitrix24": {
     "application_code": "",
     "redirect_url": "",
+    "test_portal_url": "",
     "scope": [],
     "uninstall_data_policy": ""
+  },
+  "checkpoints": {
+    "cloudpanel_site_created": false,
+    "deploy_user_created": false,
+    "deploy_public_key_installed": false,
+    "deploy_key_login_verified": false,
+    "database_connection_verified": false,
+    "tls_verified": false,
+    "backup_created": false,
+    "restore_drill_verified": false,
+    "bitrix24_test_installation_verified": false,
+    "entity_contract_verified": false,
+    "test_deployment_verified": false
   }
 }

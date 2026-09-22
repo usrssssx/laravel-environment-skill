@@ -33,6 +33,9 @@ For a single-server baseline, keep the bootstrap registry encrypted under the La
 ## Verification
 
 - Use contract tests against a fake adapter for normal CI.
-- Run opt-in integration tests against a dedicated test portal when credentials are available.
+- Deploy the application first, then ask the user to install it on a dedicated test portal. Local mocks cannot complete this checkpoint.
+- Open the application from the Bitrix24 interface and verify the server-side launch gate before storage checks.
+- Run opt-in integration tests against that dedicated test portal with actual installation credentials.
 - Verify installation, create/read/update/delete, pagination, retry behavior, portal isolation, duplicate webhook handling, token refresh, and uninstall policy.
 - Never run destructive integration tests against a production portal.
+- Keep `bitrix24_test_installation_verified` and `entity_contract_verified` false until live test-portal checks pass. Use `LOCAL_READY` when only fake-adapter tests pass.
