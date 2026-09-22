@@ -1,0 +1,1 @@
+23 3 * * * flock -n __HOME__/.config/__PROJECT_SLUG__/mysql-backup.lock __HOME__/bin/__PROJECT_SLUG__-mysql-backup >> __HOME__/logs/__PROJECT_SLUG__-mysql-backup.log 2>&1 # codex-__PROJECT_SLUG__-mysql-backup

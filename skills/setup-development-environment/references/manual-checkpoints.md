@@ -21,8 +21,8 @@ Use this protocol for every CloudPanel action.
    - Bitrix24: application is installed on a dedicated test portal and `bitrix24_test_installation_verified` passes.
 6. `entity_contract_verified` for `entity.*`: live create/read/update/delete and portal isolation checks pass.
 7. `tls_verified`: trusted certificate, hostname, validity, and HTTPS redirect pass.
-8. `backup_created`: a fresh nonempty backup exists under the approved backup provider.
-9. `restore_drill_verified`: the backup was restored into an isolated test target and checked.
+8. `backup_created`: the skill configured the native/provider backup automatically and verified a fresh nonempty artifact. This is not a routine user-owned CloudPanel action.
+9. `restore_drill_verified`: the skill restored the backup into an isolated test target and checked it without touching the source database.
 10. `test_deployment_verified`: GitHub deployed the expected test commit, health passed, and rollback was exercised.
 
 ## Evidence rule

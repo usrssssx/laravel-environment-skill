@@ -16,7 +16,7 @@
 12. Guide trusted-certificate issuance and verify TLS.
 13. If GitHub CLI authentication is missing or expired, start the bundled browser-auth helper in a TTY, wait for the user's browser confirmation, and verify the resulting session. Then configure GitHub Actions, secrets, environments, and repository settings.
 14. Run and verify real test deployment and rollback.
-15. Verify daily backup and an isolated restore drill.
+15. Configure the daily MySQL backup automatically over SSH, then verify a fresh artifact and an isolated restore drill.
 16. Prepare controlled production deployment without triggering it.
 17. Revalidate all checkpoints and produce the final report.
 

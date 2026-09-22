@@ -19,6 +19,8 @@ def main():
         SKILL / "SKILL.md",
         SKILL / "agents" / "openai.yaml",
         SKILL / "assets" / "project-environment.example.json",
+        SKILL / "assets" / "server" / "mysql-backup.sh.tpl",
+        SKILL / "assets" / "server" / "mysql-backup.cron.tpl",
         SKILL / "scripts" / "preflight.sh",
         SKILL / "scripts" / "validate_config.py",
         SKILL / "scripts" / "generate_deploy_key.sh",
@@ -128,6 +130,17 @@ def main():
             fail(errors, f"CloudPanel reference is missing requirement: {marker}")
     if internal_instruction_url not in cloudpanel_text:
         fail(errors, "CloudPanel checkpoint is missing the user-provided instruction URL")
+
+    backup_text = (SKILL / "references" / "backup-policy.md").read_text(encoding="utf-8")
+    backup_requirements = {
+        "automatic SSH setup": "Do not ask the user to configure MySQL backups manually",
+        "protected credential file": "file to mode `600`",
+        "five-day retention": "older than five days",
+        "isolated restore": "never restore over the source database",
+    }
+    for label, marker in backup_requirements.items():
+        if marker not in backup_text:
+            fail(errors, f"backup policy is missing requirement: {label}")
 
     starter = SKILL / "assets" / "starter" / "bitrix24-browser-gate"
     controller_text = (starter / "app" / "Http" / "Controllers" / "Bitrix24AppController.php.tpl").read_text(encoding="utf-8")

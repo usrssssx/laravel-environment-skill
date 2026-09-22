@@ -14,7 +14,7 @@ A reusable Codex skill that guides a beginner through a verified native PHP/Lara
 - prepares GitHub Actions, immutable release archives, test deployment, health checks, and application rollback;
 - starts GitHub CLI browser authorization itself when the local session is missing or expired;
 - guides CloudPanel site, deploy-user, ED25519 key, and trusted TLS setup one step at a time;
-- requires daily backups and a real isolated restore drill;
+- automatically configures daily MySQL backups over SSH, enforces retention of no more than five days, and performs a real isolated restore drill;
 - requires a verified CloudPanel/external MySQL target or a live Bitrix24 `entity.*` test-portal contract;
 - prevents secrets from entering Git or deployment artifacts;
 - never starts a production deployment without explicit authorization.
