@@ -77,12 +77,13 @@ For `bitrix24_entity`:
 ## Phase 3: collect infrastructure data
 
 1. Copy `assets/project-environment.example.json` to `project-environment.json` only if no config exists.
-2. Fill values already discovered from the repository and environment.
-3. Keep secrets out of this file.
-4. Run `scripts/validate_config.py project-environment.json <storage-profile>` after every completed checkpoint.
-5. Translate only `next_step` into a concise plain-text instruction or question. Do not expose validator JSON.
-6. Accept a bootstrap SSH password in the user's chat response when needed; treat it as transient sensitive input and never copy it into project files or reports. Obtain long-lived secrets from existing GitHub Environment Secrets, protected process environment variables, or an approved secure input channel. Never request that secrets be committed to a file.
-7. When a manual checkpoint is needed, explain the action, expected result, and how it will be verified. Pause there. Resume from the saved checkpoint when the user responds.
+2. Before adding infrastructure values, ensure `project-environment.json`, `environment-setup-report.md`, and `setup-required-inputs.md` are ignored by Git and are not tracked. If a fresh project accidentally tracked empty template versions, remove only those paths from the index while preserving the local files before recording hostnames, IPs, users, paths, or URLs.
+3. Fill values already discovered from the repository and environment.
+4. Keep secrets out of this file. Treat server hostnames, IP addresses, usernames, paths, and operational checkpoint evidence as local infrastructure metadata even though they are not passwords.
+5. Run `scripts/validate_config.py project-environment.json <storage-profile>` after every completed checkpoint.
+6. Translate only `next_step` into a concise plain-text instruction or question. Do not expose validator JSON.
+7. Accept a bootstrap SSH password in the user's chat response when needed; treat it as transient sensitive input and never copy it into project files or reports. Obtain long-lived secrets from existing GitHub Environment Secrets, protected process environment variables, or an approved secure input channel. Never request that secrets be committed to a file.
+8. When a manual checkpoint is needed, explain the action, expected result, and how it will be verified. Pause there. Resume from the saved checkpoint when the user responds.
 
 Required external secrets normally include:
 

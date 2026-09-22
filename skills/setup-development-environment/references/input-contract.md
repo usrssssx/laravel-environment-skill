@@ -2,6 +2,8 @@
 
 Use `project-environment.json` internally for non-secret project and infrastructure data. Start from `../assets/project-environment.example.json`. The agent owns this file; the user never has to compose or edit it.
 
+`project-environment.json`, `environment-setup-report.md`, and `setup-required-inputs.md` are local operational files. Add them to `.gitignore` before populating infrastructure metadata and verify they are absent from `git ls-files`. Do not publish server hostnames, IP addresses, usernames, filesystem paths, or checkpoint evidence merely because they are not authentication secrets.
+
 ## Rules
 
 - Discover `git.repository` and `git.repository_url` from the existing `origin` remote when possible.

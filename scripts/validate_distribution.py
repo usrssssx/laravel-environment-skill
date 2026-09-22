@@ -95,6 +95,7 @@ def main():
         "stepwise collection": "Request only the current validator `next_step`",
         "no user-facing JSON": "Do not ask the user for JSON",
         "agent-started GitHub authentication": "run `scripts/start_github_auth.sh` with TTY enabled",
+        "local operational metadata": "Add them to `.gitignore` before populating infrastructure metadata",
     }
     for label, marker in completion_requirements.items():
         if marker not in input_contract:
