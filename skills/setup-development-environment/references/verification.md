@@ -11,6 +11,7 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Application and health endpoint respond over HTTP.
 - Direct browser access shows `Откройте приложение из Битрикс24`.
 - The deployed launch, installation, and settings URLs exist, reject direct opening, and are printed from `site.test_url` in the final result.
+- `scripts/verify_bitrix24_installer.sh <project-root>` confirms that the installer waits for SDK readiness, guards `window.BX24`, permits both official SDK hosts in CSP, and can retrieve at least one SDK that defines `window.BX24`.
 - Forged launch data is rejected and a mocked valid `app.info` launch opens the empty application shell.
 - The launch gate does not expose OAuth tokens and its CSP permits only the verified portal to frame an authorized response.
 - Selected storage profile passes its checks.

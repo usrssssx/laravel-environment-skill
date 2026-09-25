@@ -8,6 +8,7 @@ Use this gate for every newly scaffolded application. For an existing Laravel ap
 - `GET /` and direct `GET` requests to all three Bitrix24 endpoints show `Откройте приложение из Битрикс24`.
 - `POST /bitrix24/launch` accepts the launch payload sent by Bitrix24, validates `DOMAIN`, `AUTH_ID`, and `member_id`, and verifies the token server-side with `POST https://<DOMAIN>/rest/app.info.json`.
 - `POST /bitrix24/install` accepts the same validated context, permits `app.info` with `INSTALLED: false`, and renders a nonce-protected page that calls `BX24.installFinish()` after the empty starter has completed its required setup. Never call `installFinish` before project-specific installation work succeeds.
+- Never reference the bare `BX24` global immediately after a static SDK tag. Load an official SDK URL with an explicit `onload` handler, verify `window.BX24` and `window.BX24.init`, then call `window.BX24.installFinish()`. Provide the second official SDK hostname as a fallback and allow both hosts in CSP. If both fail, render a controlled retry message instead of raising `ReferenceError`.
 - `POST /bitrix24/settings` uses the same installed-application verification as the launch URL.
 - Create a short-lived server-side session only when `app.info` returns an application result with an ID, code, and installed state.
 - Store only the verified portal hostname, application identifiers, member identifier, and session timestamps. Do not store the access or refresh token in the session.
@@ -51,6 +52,7 @@ Local plain-HTTP verification may temporarily use `SESSION_SECURE_COOKIE=false`;
 - Fake iframe or referrer headers do not grant access.
 - Missing, invalid, and expired tokens do not create a session and receive HTTP 403 on launch POST.
 - Direct requests to installation and settings URLs remain gated; a verified installation POST renders the `installFinish` page without exposing OAuth tokens.
+- Run `scripts/verify_bitrix24_installer.sh <project-root>` before deployment. If it fails, replace the unsafe loader with the current starter implementation, rerun feature tests, and rerun the verifier before continuing.
 - A mocked successful `app.info` response rotates the session and redirects to `/`.
 - The authorized shell contains no credentials and uses the verified portal in `frame-ancestors`.
 - A top-level request with an otherwise valid session still receives the denied screen.
