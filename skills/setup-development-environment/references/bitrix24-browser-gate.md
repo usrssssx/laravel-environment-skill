@@ -5,7 +5,8 @@ Use this gate for every newly scaffolded application. For an existing Laravel ap
 ## Required behavior
 
 - Configure the Bitrix24 application URL as `https://<application-host>/bitrix24/launch`, the installation URL as `https://<application-host>/bitrix24/install`, and the settings URL as `https://<application-host>/bitrix24/settings`.
-- `GET /` and direct `GET` requests to all three Bitrix24 endpoints show `Откройте приложение из Битрикс24`.
+- `GET /` and direct `GET` requests to all three Bitrix24 endpoints show the branded access screen with `Приложение доступно только внутри Битрикс24`, the bundled official `База Бизнеса` logo sourced from `bazabz.ru`, and `Вас приветствует команда База Бизнеса`.
+- Bundle the logo locally at `public/brand/business-base-logo.png`; do not hotlink it. The current source asset is `https://bazabz.ru/_mirror_external/i.1.creatium.io/disk2/0d/09/e3/b4485a110a2df458268cb82526126adb71/logotip_baza_biznesa.png`.
 - `POST /bitrix24/launch` accepts the launch payload sent by Bitrix24, validates `DOMAIN`, `AUTH_ID`, and `member_id`, and verifies the token server-side with `POST https://<DOMAIN>/rest/app.info.json`.
 - `POST /bitrix24/install` accepts the same validated context, permits `app.info` with `INSTALLED: false`, and renders a nonce-protected page that calls `BX24.installFinish()` after the empty starter has completed its required setup. Never call `installFinish` before project-specific installation work succeeds.
 - Never reference the bare `BX24` global immediately after a static SDK tag. Load an official SDK URL with an explicit `onload` handler, verify `window.BX24` and `window.BX24.init`, then call `window.BX24.installFinish()`. Provide the second official SDK hostname as a fallback and allow both hosts in CSP. If both fail, render a controlled retry message instead of raising `ReferenceError`.

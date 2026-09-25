@@ -9,9 +9,14 @@ final class Bitrix24BrowserGateTest extends TestCase
 {
     public function test_direct_browser_access_is_denied(): void
     {
+        $this->assertFileExists(public_path('brand/business-base-logo.png'));
+
         $this->get('/')
             ->assertOk()
-            ->assertSeeText('Откройте приложение из Битрикс24')
+            ->assertSeeText('Приложение доступно только внутри Битрикс24')
+            ->assertSeeText('Вас приветствует команда')
+            ->assertSeeText('База Бизнеса')
+            ->assertSee('/brand/business-base-logo.png', false)
             ->assertHeader('Content-Security-Policy', "default-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'none'");
     }
 
@@ -20,7 +25,7 @@ final class Bitrix24BrowserGateTest extends TestCase
         $this->withHeaders([
             'Referer' => 'https://example.bitrix24.ru/',
             'Sec-Fetch-Dest' => 'iframe',
-        ])->get('/')->assertSeeText('Откройте приложение из Битрикс24');
+        ])->get('/')->assertSeeText('Приложение доступно только внутри Битрикс24');
     }
 
     public function test_direct_bitrix24_endpoints_are_denied(): void
@@ -28,7 +33,7 @@ final class Bitrix24BrowserGateTest extends TestCase
         foreach (['/bitrix24/launch', '/bitrix24/install', '/bitrix24/settings'] as $path) {
             $this->get($path)
                 ->assertOk()
-                ->assertSeeText('Откройте приложение из Битрикс24');
+                ->assertSeeText('Приложение доступно только внутри Битрикс24');
         }
     }
 
@@ -69,7 +74,7 @@ final class Bitrix24BrowserGateTest extends TestCase
             'DOMAIN' => 'example.bitrix24.ru',
             'AUTH_ID' => 'expired-access-token',
             'member_id' => 'portal-member-id',
-        ])->assertForbidden()->assertSeeText('Откройте приложение из Битрикс24');
+        ])->assertForbidden()->assertSeeText('Приложение доступно только внутри Битрикс24');
 
         $this->assertFalse(session()->has('bitrix24.context'));
     }
@@ -95,7 +100,7 @@ final class Bitrix24BrowserGateTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSeeText('Откройте приложение из Битрикс24');
+            ->assertSeeText('Приложение доступно только внутри Битрикс24');
 
         $this->withHeader('Sec-Fetch-Dest', 'iframe')->get('/')
             ->assertOk()
@@ -116,6 +121,6 @@ final class Bitrix24BrowserGateTest extends TestCase
                 'portal' => 'example.bitrix24.ru',
                 'expires_at' => time() - 1,
             ],
-        ])->get('/')->assertSeeText('Откройте приложение из Битрикс24');
+        ])->get('/')->assertSeeText('Приложение доступно только внутри Битрикс24');
     }
 }

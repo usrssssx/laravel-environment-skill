@@ -9,7 +9,7 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Required native tools and PHP extensions are installed at compatible versions.
 - MySQL, Redis, PHP-FPM, Nginx, queue, and scheduler are healthy when applicable.
 - Application and health endpoint respond over HTTP.
-- Direct browser access shows `Откройте приложение из Битрикс24`.
+- Direct browser access shows the branded Bitrix24-only message, the local `База Бизнеса` logo asset, and the team signature.
 - The deployed launch, installation, and settings URLs exist, reject direct opening, and are printed from `site.test_url` in the final result.
 - `scripts/verify_bitrix24_installer.sh <project-root>` confirms that the installer waits for SDK readiness, guards `window.BX24`, permits both official SDK hosts in CSP, and can retrieve at least one SDK that defines `window.BX24`.
 - Forged launch data is rejected and a mocked valid `app.info` launch opens the empty application shell.
