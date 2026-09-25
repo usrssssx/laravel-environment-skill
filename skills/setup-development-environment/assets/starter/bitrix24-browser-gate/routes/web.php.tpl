@@ -7,6 +7,12 @@ Route::get('/', [Bitrix24AppController::class, 'index'])->name('bitrix24.app');
 Route::match(['get', 'post'], '/bitrix24/launch', [Bitrix24AppController::class, 'launch'])
     ->middleware('throttle:20,1')
     ->name('bitrix24.launch');
+Route::match(['get', 'post'], '/bitrix24/install', [Bitrix24AppController::class, 'install'])
+    ->middleware('throttle:20,1')
+    ->name('bitrix24.install');
+Route::match(['get', 'post'], '/bitrix24/settings', [Bitrix24AppController::class, 'launch'])
+    ->middleware('throttle:20,1')
+    ->name('bitrix24.settings');
 
 Route::get('/health', static function () {
     $revisionFile = base_path('REVISION');

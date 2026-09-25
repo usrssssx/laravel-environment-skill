@@ -71,6 +71,39 @@ final class Bitrix24AppController extends Controller
         return redirect()->route('bitrix24.app');
     }
 
+    public function install(Request $request, LaunchVerifier $verifier): Response
+    {
+        if (! $request->isMethod('post')) {
+            return $this->denied();
+        }
+
+        $payload = $request->only(['DOMAIN', 'AUTH_ID', 'member_id']);
+        $validation = Validator::make($payload, [
+            'DOMAIN' => ['required', 'string', 'max:253'],
+            'AUTH_ID' => ['required', 'string', 'min:10', 'max:2048'],
+            'member_id' => ['required', 'string', 'max:128'],
+        ]);
+
+        if ($validation->fails()) {
+            return $this->denied(403);
+        }
+
+        try {
+            $verified = $verifier->verify($payload['DOMAIN'], $payload['AUTH_ID'], false);
+        } catch (Throwable $exception) {
+            Log::warning('Bitrix24 installation verification failed.', ['reason' => $exception::class]);
+
+            return $this->denied(403);
+        }
+
+        $nonce = base64_encode(random_bytes(18));
+
+        return response()
+            ->view('bitrix24.install', ['nonce' => $nonce])
+            ->header('Cache-Control', 'no-store')
+            ->header('Content-Security-Policy', "default-src 'self'; script-src 'self' https://api.bitrix24.tech 'nonce-{$nonce}'; frame-ancestors https://{$verified['portal']}");
+    }
+
     private function denied(int $status = 200): Response
     {
         return response()

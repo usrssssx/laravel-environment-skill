@@ -23,6 +23,38 @@ final class Bitrix24BrowserGateTest extends TestCase
         ])->get('/')->assertSeeText('Откройте приложение из Битрикс24');
     }
 
+    public function test_direct_bitrix24_endpoints_are_denied(): void
+    {
+        foreach (['/bitrix24/launch', '/bitrix24/install', '/bitrix24/settings'] as $path) {
+            $this->get($path)
+                ->assertOk()
+                ->assertSeeText('Откройте приложение из Битрикс24');
+        }
+    }
+
+    public function test_verified_installation_context_renders_install_finish_page(): void
+    {
+        Http::fake([
+            'https://example.bitrix24.ru/rest/app.info.json' => Http::response([
+                'result' => [
+                    'ID' => 17,
+                    'CODE' => 'vendor.application',
+                    'INSTALLED' => false,
+                ],
+            ]),
+        ]);
+        config()->set('bitrix24.allowed_portal_hosts', ['example.bitrix24.ru']);
+
+        $this->post('/bitrix24/install', [
+            'DOMAIN' => 'example.bitrix24.ru',
+            'AUTH_ID' => 'valid-access-token',
+            'member_id' => 'portal-member-id',
+        ])->assertOk()
+            ->assertSee('BX24.installFinish()', false)
+            ->assertDontSee('valid-access-token')
+            ->assertHeader('Cache-Control', 'no-store, private');
+    }
+
     public function test_invalid_launch_does_not_create_a_session(): void
     {
         Http::fake([

@@ -105,7 +105,7 @@ Required external secrets normally include:
 6. Pin application dependencies and record installed runtime versions. Do not replace compatible existing runtimes unnecessarily.
 7. Keep `.env`, keys, tokens, dumps, and runtime data outside Git.
 8. Add basic application and health checks; preserve existing test conventions.
-9. New applications must expose the configured Bitrix24 launch URL at `/bitrix24/launch`. A direct browser request to `/` or `/bitrix24/launch` must show exactly `Откройте приложение из Битрикс24`; only a launch POST whose OAuth token passes a server-side `app.info` call may create an application session.
+9. New applications must expose Bitrix24 URLs at `/bitrix24/launch`, `/bitrix24/install`, and `/bitrix24/settings`. The installation page must verify the supplied portal context and call `BX24.installFinish()` only after required setup succeeds. A direct browser request to `/` or any Bitrix24 endpoint must show exactly `Откройте приложение из Битрикс24`; only a POST whose OAuth token passes a server-side `app.info` call may open application behavior.
 10. Never treat iframe presence, `Referer`, request headers, `DOMAIN`, or `member_id` as proof of Bitrix24 access. Never return, log, flash, or store `AUTH_ID` or `REFRESH_ID` in a browser-accessible store.
 
 ## Phase 5: prepare Git and GitHub
@@ -186,3 +186,9 @@ Create `environment-setup-report.md` containing:
 For `LOCAL_READY`, include only the next required manual checkpoint in `setup-required-inputs.md` and the user-facing response. Do not overwhelm the user with all later steps. Omit it only when deployment was explicitly excluded.
 
 Do not say "автодеплой настроен" unless a real test deployment and external health check succeeded.
+
+For `READY`, derive the following values from the verified `site.test_url`, verify that each route exists on the deployed revision, save them in `environment-setup-report.md`, and always print them in the final response without asking the user to construct them:
+
+- `Ссылка на приложение: <site.test_url>/bitrix24/launch`
+- `Ссылка на установочное приложение: <site.test_url>/bitrix24/install`
+- `Настройки приложения: <site.test_url>/bitrix24/settings`

@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
             'bitrix24/launch',
+            'bitrix24/install',
+            'bitrix24/settings',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

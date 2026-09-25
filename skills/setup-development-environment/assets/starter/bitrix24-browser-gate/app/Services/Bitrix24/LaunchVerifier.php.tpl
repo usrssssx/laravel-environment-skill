@@ -7,8 +7,8 @@ use RuntimeException;
 
 final class LaunchVerifier
 {
-    /** @return array{portal: string, app_id: int, app_code: string} */
-    public function verify(string $portal, string $accessToken): array
+    /** @return array{portal: string, app_id: int, app_code: string, installed: bool} */
+    public function verify(string $portal, string $accessToken, bool $requireInstalled = true): array
     {
         $host = $this->normalizeHost($portal);
         $pinnedAddress = $this->trustedAddress($host);
@@ -31,11 +31,13 @@ final class LaunchVerifier
 
         $result = $response->successful() ? $response->json('result') : null;
 
+        $installed = is_array($result) && ($result['INSTALLED'] ?? false) === true;
+
         if (! is_array($result)
             || ! is_numeric($result['ID'] ?? null)
             || ! is_string($result['CODE'] ?? null)
             || ($result['CODE'] ?? '') === ''
-            || ($result['INSTALLED'] ?? false) !== true) {
+            || ($requireInstalled && ! $installed)) {
             throw new RuntimeException('Bitrix24 rejected the application context.');
         }
 
@@ -43,6 +45,7 @@ final class LaunchVerifier
             'portal' => $host,
             'app_id' => (int) $result['ID'],
             'app_code' => $result['CODE'],
+            'installed' => $installed,
         ];
     }
 
