@@ -124,7 +124,7 @@ Required external secrets normally include:
    - no force-push or deletion;
    - successful CI and no force-push for `test`.
 8. Never claim GitHub settings were applied without querying them afterward.
-9. A test deployment triggered by `workflow_run` is registered by GitHub only after its workflow file exists on the default branch. For a new repository, create a bootstrap Pull Request from `test` to `main`, wait for required CI, and ask the user for the required approval/merge when branch protection requires a separate reviewer. Never bypass branch protection with administrator privileges without explicit authorization. After the workflow reaches `main`, push a new `test` revision to exercise the automatic deployment.
+9. A test deployment triggered by `workflow_run` is registered by GitHub only after its workflow file exists on the default branch. For a new repository, create a bootstrap Pull Request from `test` to `main`, wait for required CI, and ask the user for the required approval/merge when branch protection requires a separate reviewer. Never bypass branch protection with administrator privileges without explicit authorization. After the workflow reaches `main`, create and push a new ordinary commit on `test` to exercise the automatic deployment. Do not merge or fast-forward the `main` merge commit back into `test` when the branch rules forbid merge commits.
 
 ## Phase 6: prepare server and deployment
 

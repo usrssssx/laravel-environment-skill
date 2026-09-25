@@ -16,14 +16,49 @@ exec 9>"$deploy_path/deploy.lock"
 flock -n 9 || { echo "ERROR: another deployment is running" >&2; exit 1; }
 
 release="$deploy_path/releases/$revision"
+runtime_reload="$deploy_path/shared/reload-runtime"
 previous=""
 if [[ -L "$deploy_path/current" ]]; then
   previous="$(readlink -f "$deploy_path/current")"
 fi
 
+reload_runtime() {
+  if [[ -x "$runtime_reload" ]]; then
+    "$runtime_reload"
+  fi
+}
+
+wait_for_revision() {
+  local expected="$1"
+  local observed=""
+  local consecutive=0
+
+  for _ in {1..60}; do
+    observed="$(curl --fail --show-error --silent --max-time 10 "$health_url/health" 2>/dev/null | php -r '$payload=json_decode(stream_get_contents(STDIN), true); echo is_array($payload) ? ($payload["revision"] ?? "") : "";' 2>/dev/null || true)"
+    if [[ "$observed" == "$expected" ]]; then
+      consecutive=$((consecutive + 1))
+      if (( consecutive >= 3 )); then
+        return 0
+      fi
+    else
+      consecutive=0
+    fi
+    sleep 2
+  done
+
+  echo "ERROR: HTTP health did not stabilize on revision $expected; last observed: ${observed:-<empty>}" >&2
+  return 1
+}
+
 if [[ -e "$release" ]]; then
-  echo "ERROR: release already exists: $release" >&2
-  exit 1
+  if [[ "$previous" == "$release" ]]; then
+    reload_runtime
+    wait_for_revision "$revision"
+    rm -f "$archive" "$0"
+    echo "DEPLOYED_REVISION=$revision"
+    exit 0
+  fi
+  rm -rf -- "$release"
 fi
 
 mkdir "$release"
@@ -54,18 +89,26 @@ ln -s "$release" "$deploy_path/current.next"
 mv -Tf "$deploy_path/current.next" "$deploy_path/current"
 
 rollback_application() {
+  local exit_code=$?
+  trap - ERR
   if [[ -n "$previous" && -d "$previous" ]]; then
+    local previous_revision="${previous##*/}"
+    set +e
     ln -s "$previous" "$deploy_path/current.rollback"
     mv -Tf "$deploy_path/current.rollback" "$deploy_path/current"
+    reload_runtime
     cd "$previous"
     php artisan queue:restart || true
+    wait_for_revision "$previous_revision" || true
   fi
+  exit "$exit_code"
 }
 
 trap rollback_application ERR
 
+reload_runtime
 php artisan queue:restart
-curl --fail --show-error --silent --retry 5 --retry-delay 2 "$health_url/health" >/dev/null
+wait_for_revision "$revision"
 
 trap - ERR
 rm -f "$archive" "$0"

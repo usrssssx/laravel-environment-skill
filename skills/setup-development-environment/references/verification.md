@@ -43,9 +43,9 @@ Record commands and outcomes in `environment-setup-report.md`.
 - Test workflow completed successfully.
 - External HTTPS health check passed.
 - Trusted TLS certificate matches the hostname, has acceptable remaining validity, and HTTP redirects to HTTPS.
-- Both the server `current` symlink and the HTTP health revision equal the expected commit/digest; HTTP 200 alone is insufficient.
+- Both the server `current` symlink and at least three consecutive HTTP health responses equal the expected commit/digest; HTTP 200 or one matching response alone is insufficient because PHP-FPM workers may cache the prior symlink target.
 - Storage, Redis, queue, scheduler, and logs were checked.
-- Application rollback was tested without destructive database rollback.
+- Application rollback was tested between two compatible verified releases without destructive database rollback; a replaced unrelated application does not count as the rollback target.
 - A fresh daily backup exists with a retention period from one to five days.
 - Restore into an isolated test target completed and representative data/schema checks passed.
 - For MySQL, the approved target, least-privilege user, connection collation, and write probe were verified.
