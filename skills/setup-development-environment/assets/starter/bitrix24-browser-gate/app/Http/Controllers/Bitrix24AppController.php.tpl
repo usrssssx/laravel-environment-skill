@@ -101,7 +101,7 @@ final class Bitrix24AppController extends Controller
         return response()
             ->view('bitrix24.install', ['nonce' => $nonce])
             ->header('Cache-Control', 'no-store')
-            ->header('Content-Security-Policy', "default-src 'self'; script-src 'self' https://api.bitrix24.tech 'nonce-{$nonce}'; frame-ancestors https://{$verified['portal']}");
+            ->header('Content-Security-Policy', "default-src 'self'; script-src 'self' https://api.bitrix24.com https://api.bitrix24.tech 'nonce-{$nonce}'; frame-ancestors https://{$verified['portal']}");
     }
 
     private function denied(int $status = 200): Response

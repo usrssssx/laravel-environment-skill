@@ -50,7 +50,8 @@ final class Bitrix24BrowserGateTest extends TestCase
             'AUTH_ID' => 'valid-access-token',
             'member_id' => 'portal-member-id',
         ])->assertOk()
-            ->assertSee('BX24.installFinish()', false)
+            ->assertSee('window.BX24.installFinish()', false)
+            ->assertSee('script.onload = finish', false)
             ->assertDontSee('valid-access-token')
             ->assertHeader('Cache-Control', 'no-store, private');
     }
