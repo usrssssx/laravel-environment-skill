@@ -12,11 +12,19 @@ done
 
 mysql \
   --protocol=TCP \
+  --host="$MYSQL_HOST" \
+  --port="$MYSQL_TCP_PORT" \
+  --user="$MYSQL_USER" \
+  --database="$MYSQL_DATABASE" \
   --batch \
   --skip-column-names \
   --execute="select database(), current_user(), version(), @@character_set_database, @@collation_database;"
 
 mysql \
   --protocol=TCP \
+  --host="$MYSQL_HOST" \
+  --port="$MYSQL_TCP_PORT" \
+  --user="$MYSQL_USER" \
+  --database="$MYSQL_DATABASE" \
   --batch \
   --execute="start transaction; create temporary table codex_environment_probe(id integer primary key); insert into codex_environment_probe values (1); select count(*) from codex_environment_probe; rollback;"

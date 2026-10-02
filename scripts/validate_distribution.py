@@ -154,7 +154,7 @@ def main():
     gate_text = (starter / "resources" / "views" / "bitrix24" / "gate.blade.php.tpl").read_text(encoding="utf-8")
 
     security_requirements = {
-        "direct-access message": (gate_text, "Откройте приложение из Битрикс24"),
+        "direct-access message": (gate_text, "Приложение доступно только внутри Битрикс24"),
         "server-side app.info verification": (verifier_text, "/rest/app.info.json"),
         "outbound redirect blocking": (verifier_text, "'allow_redirects' => false"),
         "public-address validation": (verifier_text, "FILTER_FLAG_NO_PRIV_RANGE"),

@@ -12,6 +12,44 @@ SKILL_SCRIPTS = ROOT / "skills" / "setup-development-environment" / "scripts"
 
 
 class OperationalHelpersTest(unittest.TestCase):
+    def test_mysql_helper_passes_all_connection_fields_to_client(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fake_bin = Path(directory) / "bin"
+            fake_bin.mkdir()
+            calls = Path(directory) / "calls"
+            fake_mysql = fake_bin / "mysql"
+            fake_mysql.write_text(
+                "#!/usr/bin/env bash\n"
+                "printf '%s\\n' \"$*\" >> \"$FAKE_MYSQL_CALLS\"\n",
+                encoding="utf-8",
+            )
+            fake_mysql.chmod(0o755)
+            env = os.environ.copy()
+            env.update({
+                "PATH": f"{fake_bin}:{env['PATH']}",
+                "FAKE_MYSQL_CALLS": str(calls),
+                "MYSQL_HOST": "127.0.0.1",
+                "MYSQL_TCP_PORT": "3307",
+                "MYSQL_DATABASE": "app_test",
+                "MYSQL_USER": "app_user",
+                "MYSQL_PWD": "fixture-password",
+            })
+
+            result = subprocess.run(
+                [str(SKILL_SCRIPTS / "verify_mysql.sh")],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+
+            self.assertEqual(0, result.returncode)
+            call_log = calls.read_text(encoding="utf-8")
+            self.assertEqual(2, call_log.count("--host=127.0.0.1"))
+            self.assertEqual(2, call_log.count("--port=3307"))
+            self.assertEqual(2, call_log.count("--user=app_user"))
+            self.assertEqual(2, call_log.count("--database=app_test"))
+
     def test_cloudpanel_path_helper_discovers_path_over_key_only_ssh(self):
         with tempfile.TemporaryDirectory() as directory:
             temp = Path(directory)

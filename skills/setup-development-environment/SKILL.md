@@ -97,7 +97,7 @@ Required external secrets normally include:
 
 ## Phase 4: prepare local environment
 
-1. For a missing application, create a stable Laravel version compatible with the available PHP 8.x runtime, then install the starter files from `assets/starter/bitrix24-browser-gate/`.
+1. For a missing application, create a stable Laravel version compatible with the available PHP 8.x runtime, then install the starter files from `assets/starter/bitrix24-browser-gate/`. Remove the unreferenced stock `resources/views/welcome.blade.php` after replacing its route. When the current Laravel starter enables a remote font provider in `vite.config.js`, remove that plugin configuration and use the local system-font stack unless the application actually requires a bundled brand font; production builds must not require an unused remote font download.
 2. For an existing application, make the smallest environment-only changes.
 3. Configure Blade/Vite by default. Preserve or configure Vue 3 when detected or specified.
 4. Detect the operating system and available package manager. Install or configure PHP, required extensions, Composer, Node.js, MySQL when selected, Redis when enabled, and local process controls without Docker.
@@ -107,7 +107,7 @@ Required external secrets normally include:
 8. Add basic application and health checks; preserve existing test conventions.
 9. New applications must expose Bitrix24 URLs at `/bitrix24/launch`, `/bitrix24/install`, and `/bitrix24/settings`. The installation page must verify the supplied portal context and call `BX24.installFinish()` only after required setup succeeds. A direct browser request to `/` or any Bitrix24 endpoint must show the branded access screen with `Приложение доступно только внутри Битрикс24`, the official bundled `База Бизнеса` logo from `bazabz.ru`, and the signature `Вас приветствует команда База Бизнеса`; only a POST whose OAuth token passes a server-side `app.info` call may open application behavior.
 10. Before local completion and again before deployment, run `scripts/verify_bitrix24_installer.sh <project-root>`. If it detects a direct `BX24.init`/`BX24.installFinish` call before SDK readiness, a missing load handler, an unavailable SDK, or incomplete CSP hosts, repair the application from the starter installation view and controller, rerun its feature tests, and repeat the verifier. Do not defer this repair to the user or mark the environment ready while the check fails.
-10. Never treat iframe presence, `Referer`, request headers, `DOMAIN`, or `member_id` as proof of Bitrix24 access. Never return, log, flash, or store `AUTH_ID` or `REFRESH_ID` in a browser-accessible store.
+11. Never treat iframe presence, `Referer`, request headers, `DOMAIN`, or `member_id` as proof of Bitrix24 access. Never return, log, flash, or store `AUTH_ID` or `REFRESH_ID` in a browser-accessible store.
 
 ## Phase 5: prepare Git and GitHub
 
