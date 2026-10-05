@@ -32,6 +32,7 @@ def main():
         SKILL / "scripts" / "verify_backup_artifact.py",
         SKILL / "references" / "cloudpanel.md",
         SKILL / "references" / "manual-checkpoints.md",
+        SKILL / "references" / "public-instructions.md",
         SKILL / "references" / "backup-policy.md",
         SKILL / "references" / "bitrix24-browser-gate.md",
         SKILL / "assets" / "starter" / "bitrix24-browser-gate" / "bootstrap" / "app.php.tpl",
@@ -106,7 +107,12 @@ def main():
             fail(errors, f"removed PostgreSQL artifact still exists: {path.relative_to(ROOT)}")
 
     input_contract = (SKILL / "references" / "input-contract.md").read_text(encoding="utf-8")
-    internal_instruction_url = "https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419"
+    github_instruction_url = "https://codex-skills.bbshow.ru/instructions/github"
+    cloudpanel_instruction_url = "https://codex-skills.bbshow.ru/instructions/cloudpanel"
+    instruction_text = (SKILL / "references" / "public-instructions.md").read_text(encoding="utf-8")
+    for slug in ["github", "cloudpanel", "ssh", "database", "tls", "bitrix24", "deploy"]:
+        if f"https://codex-skills.bbshow.ru/instructions/{slug}" not in instruction_text:
+            fail(errors, f"missing public instruction: {slug}")
     completion_requirements = {
         "GitHub repository URL request": "git.repository_url",
         "server bootstrap password request": "DEPLOY_BOOTSTRAP_PASSWORD",
@@ -121,14 +127,14 @@ def main():
             fail(errors, f"missing pre-completion requirement: {label}")
     if "```json" in input_contract:
         fail(errors, "input contract must not show a user-facing JSON block")
-    if internal_instruction_url not in input_contract:
+    if github_instruction_url not in input_contract:
         fail(errors, "GitHub repository checkpoint is missing the user-provided instruction URL")
 
     cloudpanel_text = (SKILL / "references" / "cloudpanel.md").read_text(encoding="utf-8")
     for marker in ["Stock CloudPanel v2", "ED25519", "self-signed certificate", "MySQL database checkpoint"]:
         if marker not in cloudpanel_text:
             fail(errors, f"CloudPanel reference is missing requirement: {marker}")
-    if internal_instruction_url not in cloudpanel_text:
+    if cloudpanel_instruction_url not in cloudpanel_text:
         fail(errors, "CloudPanel checkpoint is missing the user-provided instruction URL")
 
     backup_text = (SKILL / "references" / "backup-policy.md").read_text(encoding="utf-8")

@@ -2,11 +2,11 @@
 
 CloudPanel actions are manual checkpoints. Do not control the panel through browser automation. Give the user one action, wait, then verify the observable result.
 
-Always show this user-provided instruction link first when asking the user to create or configure a CloudPanel site:
+Always show the relevant public instruction first when asking the user to create or configure a CloudPanel site (see `public-instructions.md` for SSH, database, and TLS steps):
 
-- `https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419`
+- `https://codex-skills.bbshow.ru/instructions/cloudpanel`
 
-The page may require the user's existing Bitrix24 authorization. Do not attempt to reproduce or guess its private contents. Keep the official CloudPanel links below as secondary technical references.
+The public guides require no portal authorization. Keep the official CloudPanel links below as secondary technical references.
 
 Official documentation:
 
@@ -19,7 +19,7 @@ Official documentation:
 
 ## Site checkpoint
 
-Show the user-provided Bitrix24 instruction link above, then ask the user to create a PHP site with the test domain and compatible PHP version. Ask only for the server host, generated primary site user, and test URL. Do not ask the user to find or type the site directory.
+Show the public site instruction link above, then ask the user to create a PHP site with the test domain and compatible PHP version. Ask only for the server host, generated primary site user, and test URL. Do not ask the user to find or type the site directory.
 
 After the deploy public key is installed, derive the domain from the verified test URL and run `scripts/discover_cloudpanel_site_path.sh`. Store its verified result as `server.test.path`; never invent `/var/www/...` or assume the deploy user's home. Then verify over SSH:
 

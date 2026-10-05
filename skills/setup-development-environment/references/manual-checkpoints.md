@@ -3,7 +3,7 @@
 Use this protocol for every CloudPanel action.
 
 1. State one action in plain language.
-2. For GitHub repository creation and every CloudPanel setup action, first provide `https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419`, then provide the exact expected result and any relevant official technical documentation link.
+2. First provide the relevant public link from `public-instructions.md` for GitHub, CloudPanel, SSH, database, TLS, or Bitrix24 installation, then provide the exact expected result and any relevant official technical documentation link.
 3. Ask the user to reply normally when it is done and include only values produced by that step.
 4. Do not request JSON or all future infrastructure data.
 5. Verify the result with SSH, GitHub API, DNS, TLS, HTTP, database, or application checks.

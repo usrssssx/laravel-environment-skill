@@ -4,6 +4,8 @@ Use this gate for every newly scaffolded application. For an existing Laravel ap
 
 ## Required behavior
 
+Before asking the user to register or install the application, send https://codex-skills.bbshow.ru/instructions/bitrix24 together with the three verified URLs of their project. Explain that the settings URL is not a substitute for the handler or installer and needs no extra form field when Bitrix24 does not provide one.
+
 - Configure the Bitrix24 application URL as `https://<application-host>/bitrix24/launch`, the installation URL as `https://<application-host>/bitrix24/install`, and the settings URL as `https://<application-host>/bitrix24/settings`.
 - `GET /` and direct `GET` requests to all three Bitrix24 endpoints show the branded access screen with `Приложение доступно только внутри Битрикс24`, the bundled official `База Бизнеса` logo sourced from `bazabz.ru`, and `Вас приветствует команда База Бизнеса`.
 - Bundle the logo locally at `public/brand/business-base-logo.png`; do not hotlink it. The current source asset is `https://bazabz.ru/_mirror_external/i.1.creatium.io/disk2/0d/09/e3/b4485a110a2df458268cb82526126adb71/logotip_baza_biznesa.png`.

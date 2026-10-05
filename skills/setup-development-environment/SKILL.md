@@ -21,7 +21,7 @@ When `next_step.id` is `deploy_user`, do not ask for a password first. Derive a 
 
 The user may answer with ordinary prose or `Поле: значение` lines. Never require, show, or ask the user to edit JSON. Convert answers into the internal `project-environment.json` yourself. Do not repeat a question when the answer can be parsed reasonably.
 
-Do not automate CloudPanel through browser UI. Manual control-panel actions are intentionally user-owned because UI access and layouts vary. Link the relevant official instruction, describe the exact expected result, and perform command-line or HTTPS verification afterward.
+Do not automate CloudPanel through browser UI. Manual control-panel actions are intentionally user-owned because UI access and layouts vary. Read `references/public-instructions.md` and send the matching public guide before each manual checkpoint, describe the exact expected result, and perform command-line or HTTPS verification afterward. Keep official documentation as a secondary reference.
 
 When direct public-key installation is unavailable and password authentication is explicitly selected as a fallback, accept the password in the user's ordinary chat response as the transient `DEPLOY_BOOTSTRAP_PASSWORD`. Do not repeat it in later messages. Never place its value in JSON, generated Markdown, shell history, GitHub variables, GitHub Actions, `.env`, reports, or Git. Use it only to validate initial access and install a dedicated deploy public key, then configure autodeploy with `DEPLOY_SSH_KEY`.
 

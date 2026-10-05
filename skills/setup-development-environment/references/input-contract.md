@@ -57,10 +57,10 @@ When validation fails, write `setup-required-inputs.md` with:
 
 For the initial external step, ask only for the GitHub repository URL. Later CloudPanel steps collect their own values after the user performs the action. Use ordinary text without a code fence, for example:
 
-- Инструкция по созданию репозитория и настройке CloudPanel: `https://delovayasreda.bitrix24.ru/mobile/marketplace/?id=277&base_id=15&scope=internal&node=419`
+- Инструкция по созданию репозитория: `https://codex-skills.bbshow.ru/instructions/github`
 - Ссылка на GitHub:
 
-Show this Bitrix24 instruction link first whenever asking the user to create a GitHub repository. The page may require the user's existing Bitrix24 authorization; do not attempt to reproduce or guess its private contents.
+Show this public instruction link first whenever asking the user to create a GitHub repository. For later checkpoints, select the relevant link from `public-instructions.md`; no portal authorization is needed to read the guides.
 
 At the CloudPanel site checkpoint, ask only for the server host, primary site user, and test URL produced by that step. Do not ask the user for the absolute site path. After key-only SSH works, derive the domain from `site.test_url`, run `scripts/discover_cloudpanel_site_path.sh`, verify the returned path with `scripts/verify_ssh_access.sh`, and record it as `server.test.path`.
 
