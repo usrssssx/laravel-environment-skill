@@ -18,7 +18,7 @@ Create or adapt:
 
 Use pinned major actions or immutable SHAs according to repository policy. Set minimal `permissions`, job timeouts, concurrency groups, and explicit environments.
 
-GitHub registers a `workflow_run` listener only when that workflow file exists on the default branch. In a new repository, bootstrap the deploy workflow through a Pull Request from `test` to `main`, wait for all required checks, and obtain the required independent approval before merging. Do not use administrator bypass merely to make the first deployment start. Once the workflow is present on `main`, create a new ordinary commit on `test` and verify that CI completion triggers the deploy workflow automatically. Do not fast-forward or merge the `main` merge commit into `test` when that branch prohibits merge commits.
+Trigger the deployment workflow directly on `push` to `test`. Use `workflow_call` in CI and a prerequisite job in the deployment workflow so failed checks block packaging and deployment. All jobs use `github.sha` from that push. Do not use `workflow_run` and do not require changes in `main` to enable test deployment. Set `test` as the GitHub default branch to avoid a legacy listener in `main`. Do not use administrator bypass when updating protected branches.
 
 CI must install locked dependencies, migrate a clean test database when MySQL is selected, run backend tests, run frontend production build, and validate the deploy artifact.
 

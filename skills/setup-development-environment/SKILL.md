@@ -126,7 +126,7 @@ Required external secrets normally include:
    - successful CI and no force-push for `test`.
 8. Before pushing to a protected branch, query its protection and the authenticated user's effective bypass. If administrators are exempt or GitHub would accept the push while required checks are still pending, do not push directly as an administrator. Push a `feature/*` or `fix/*` branch and merge it through a Pull Request only after the required check succeeds. Treat a remote `Bypassed rule violations` message as a workflow defect to correct, not as successful protection enforcement.
 9. Never claim GitHub settings were applied without querying them afterward.
-10. A test deployment triggered by `workflow_run` is registered by GitHub only after its workflow file exists on the default branch. For a new repository, create a bootstrap Pull Request from `test` to `main`, wait for required CI, and ask the user for the required approval/merge when branch protection requires a separate reviewer. Never bypass branch protection with administrator privileges without explicit authorization. After the workflow reaches `main`, create and push a new ordinary commit on `test` through the protected-branch path to exercise the automatic deployment. Do not merge or fast-forward the `main` merge commit back into `test` when the branch rules forbid merge commits.
+10. Trigger test deployment directly with `push` to `test`. Call the reusable CI workflow from a prerequisite job, then build and deploy `${{ github.sha }}` only after CI succeeds. Do not use `workflow_run` or require a `test` to `main` merge to activate test deployment. Keep `test` as the GitHub default and local development branch; reserve `main` for production.
 
 ## Phase 6: prepare server and deployment
 

@@ -143,7 +143,7 @@ def main():
             fail(errors, f"backup policy is missing requirement: {label}")
 
     autodeploy_text = (SKILL / "references" / "autodeploy.md").read_text(encoding="utf-8")
-    for marker in ["workflow file exists on the default branch", "Do not use administrator bypass"]:
+    for marker in ["directly on `push` to `test`", "Do not use administrator bypass"]:
         if marker not in autodeploy_text:
             fail(errors, f"autodeploy reference is missing bootstrap requirement: {marker}")
 

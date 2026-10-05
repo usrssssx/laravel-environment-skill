@@ -4,14 +4,15 @@ on:
   pull_request:
     branches: [main, test]
   push:
-    branches: [main, test]
+    branches: [main]
+  workflow_call:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

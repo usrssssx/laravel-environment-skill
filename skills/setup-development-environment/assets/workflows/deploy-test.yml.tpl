@@ -1,28 +1,28 @@
 name: Deploy test
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
+  push:
+    branches: [test]
 
 permissions:
   contents: read
 
 concurrency:
   group: deploy-test
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
+  test:
+    uses: ./.github/workflows/ci.yml
+
   build:
-    if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'test'
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: __CHECKOUT_ACTION__
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.sha }}
       - uses: __SETUP_PHP_ACTION__
         with:
           php-version: '__PHP_VERSION__'
@@ -40,14 +40,14 @@ jobs:
           npm run build
       - name: Package immutable release
         env:
-          REVISION: ${{ github.event.workflow_run.head_sha }}
+          REVISION: ${{ github.sha }}
         run: ./scripts/package-release.sh "$REVISION" ".deploy/release-$REVISION.tar.gz"
       - uses: __UPLOAD_ARTIFACT_ACTION__
         with:
-          name: release-${{ github.event.workflow_run.head_sha }}
+          name: release-${{ github.sha }}
           path: |
-            .deploy/release-${{ github.event.workflow_run.head_sha }}.tar.gz
-            .deploy/release-${{ github.event.workflow_run.head_sha }}.tar.gz.sha256
+            .deploy/release-${{ github.sha }}.tar.gz
+            .deploy/release-${{ github.sha }}.tar.gz.sha256
           retention-days: 30
 
   deploy:
@@ -58,10 +58,10 @@ jobs:
     steps:
       - uses: __CHECKOUT_ACTION__
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.sha }}
       - uses: __DOWNLOAD_ARTIFACT_ACTION__
         with:
-          name: release-${{ github.event.workflow_run.head_sha }}
+          name: release-${{ github.sha }}
           path: .deploy
       - name: Configure SSH
         env:
@@ -79,7 +79,7 @@ jobs:
           USER: ${{ vars.DEPLOY_USER }}
           PATH_ON_SERVER: ${{ vars.DEPLOY_PATH }}
           APP_URL: ${{ vars.APP_URL }}
-          REVISION: ${{ github.event.workflow_run.head_sha }}
+          REVISION: ${{ github.sha }}
         run: ./scripts/deploy-ci.sh test "$REVISION" ".deploy/release-$REVISION.tar.gz"
       - name: External health check
         env:
