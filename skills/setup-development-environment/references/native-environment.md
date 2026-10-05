@@ -22,6 +22,7 @@ Set up local and server runtimes without Docker, Compose, or container images.
 - Use a dedicated deploy user. Grant only the narrowly scoped permissions needed for release directories and approved service reloads.
 - Keep `shared/.env`, `shared/storage`, and backups outside versioned releases. Point Nginx at `<deploy-path>/current/public`.
 - Validate Nginx configuration before reload. Enable and verify PHP-FPM, Nginx, queue, and scheduler units.
+- If the CloudPanel deploy account cannot manage systemd units, configure its own idempotent cron entries instead: run `schedule:run` each minute, and a locked `queue:work` with a bounded `--max-time` that restarts each minute. Preserve unrelated cron entries, use the verified PHP binary explicitly, and keep locks/logs outside releases. Verify cron actually launches the worker and scheduler, and execute an isolated queued probe before reporting readiness.
 - Configure TLS using the server's established certificate process. Do not expose MySQL or Redis publicly.
 - Require the user to perform CloudPanel UI mutations manually, then verify them through SSH and external checks.
 
